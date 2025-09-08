@@ -6,12 +6,9 @@
 	let data = $derived(page.data);
 	let session = $derived(data.session);
 	let pageData = $derived(data.page);
-	let { children, data: layoutData } = $props();
+	let { children } = $props();
 	let pageSettings = $derived(pageData?.page_settings);
 	async function trackPageView() {
-		if (layoutData.deploymentEnvironment != "production") {
-			return;
-		}
 		const url = window.location.pathname;
 		const userAgent = navigator.userAgent;
 
@@ -20,7 +17,7 @@
 			.then(({ ip }) => {
 				navigator.sendBeacon(
 					"/api/track",
-					JSON.stringify({ url, userAgent, ip, commitSHA: layoutData.deploymentGitSHA })
+					JSON.stringify({ url, userAgent, ip })
 				);
 			});
 	}
