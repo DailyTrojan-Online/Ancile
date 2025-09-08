@@ -4,7 +4,7 @@
  */
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "muddy-morning-02d5",
+	"name": "traveler",
 	"main": "src/index.ts",
 	"compatibility_date": "2025-09-06",
 	"compatibility_flags": [
@@ -12,7 +12,8 @@
 	],
 	"assets": {
 		// The path to the directory containing the `index.html` file to be served at `/`
-		"directory": "./public"
+		"directory": "./public",
+		"binding": "ASSETS"
 	},
 	"observability": {
 		"enabled": true
