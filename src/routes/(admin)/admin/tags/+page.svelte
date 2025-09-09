@@ -221,16 +221,16 @@
 		</div>
 		<div class="admin-editor-column">
 			<h2>{editTag ? "Edit Tag" : "Add New Tag"}</h2>
-			<div class="admin-editor-metadata-group">
-				<div class="admin-editor-metadata-label">Title</div>
+			<div class="admin-editor-input-group">
+				<div class="admin-editor-input-label">Title</div>
 				<input
 					type="text"
 					bind:value={tagInputName}
 					class="admin-editor-input"
 				/>
 			</div>
-			<div class="admin-editor-metadata-group" class:admin-editor-metadata-group-error={slugError}>
-				<div class="admin-editor-metadata-label">Slug</div>
+			<div class="admin-editor-input-group" class:admin-editor-input-group-error={slugError}>
+				<div class="admin-editor-input-label">Slug</div>
 				<div class="admin-editor-metadata-slug">
 					/tags/
 					<input
@@ -245,8 +245,8 @@
                 This slug already exists, please choose another.
             </div>
             {/if}
-			<div class="admin-editor-metadata-group">
-				<div class="admin-editor-metadata-label">Description</div>
+			<div class="admin-editor-input-group">
+				<div class="admin-editor-input-label">Description</div>
 				<div class="admin-editor-metadata-slug">
 					<textarea
 						class="admin-editor-metadata-textarea"

@@ -11,7 +11,8 @@
 		columnWidths,
 		callback,
 		maxPageSize = 50,
-		selectedRows = $bindable(new Array(maxPageSize).fill(false))
+		showCheckboxes = true,
+		selectedRows = $bindable(new Array(maxPageSize).fill(false)),
 	}: {
 		displayFields: { key?: string; label: string; renderer?: Snippet<[any]> }[];
 		data: { [x: string]: any }[];
@@ -19,19 +20,26 @@
 		columnWidths?: string;
 		callback?: (data: any) => void;
 		maxPageSize?: number;
+		showCheckboxes?: boolean;
 		selectedRows?: boolean[];
 	} = $props();
-	callback = callback ?? ((data) => {
-		goto(`${editURL}${data.id}`);
-	});
+	callback =
+		callback ??
+		((data) => {
+			goto(`${editURL}${data.id}`);
+		});
 
 	let mainCheckState: TriStateCheck = $state("indeterminate");
 	let recentlyClickedIndex = -1;
-	function onRowSelectChange(e: PointerEvent | KeyboardEvent, value: boolean, index: number) {
-		if(e.shiftKey && recentlyClickedIndex != -1) {
+	function onRowSelectChange(
+		e: PointerEvent | KeyboardEvent,
+		value: boolean,
+		index: number
+	) {
+		if (e.shiftKey && recentlyClickedIndex != -1) {
 			let start = Math.min(recentlyClickedIndex, index);
 			let end = Math.max(recentlyClickedIndex, index);
-			for(let i = start; i <= end - 1; i++) {
+			for (let i = start; i <= end - 1; i++) {
 				selectedRows[i] = value;
 			}
 		}
@@ -39,7 +47,10 @@
 		recentlyClickedIndex = index;
 	}
 	$effect(() => {
-		if (selectedRows.filter(Boolean).length >= data?.length && data?.length != 0) {
+		if (
+			selectedRows.filter(Boolean).length >= data?.length &&
+			data?.length != 0
+		) {
 			mainCheckState = "true";
 		} else if (selectedRows.every((v) => !v)) {
 			mainCheckState = "false";
@@ -48,8 +59,8 @@
 		}
 	});
 	function onMainCheckChange(value: boolean) {
-		if(value) {
-			for(let i = 0; i < data?.length; i++) {
+		if (value) {
+			for (let i = 0; i < data?.length; i++) {
 				selectedRows[i] = true;
 			}
 		} else {
@@ -67,14 +78,19 @@
 		onkeydown={() => callback && callback(data)}
 		style:grid-row={`${i + 2} / ${i + 3}`}
 	>
-		<div class="admin-grid-cell" style:grid-column={`1 / 2`}>
-			<CheckboxInput bind:value={selectedRows[i]} click={(e, value)=>onRowSelectChange(e, value, i)} />
-		</div>
+		{#if showCheckboxes}
+			<div class="admin-grid-cell" style:grid-column={`1 / 2`}>
+				<CheckboxInput
+					bind:value={selectedRows[i]}
+					click={(e, value) => onRowSelectChange(e, value, i)}
+				/>
+			</div>
+		{/if}
 		{#each displayFields as field, i}
 			<div
 				class="admin-grid-cell"
 				class:admin-grid-emphasis={field.key == "title" || field.key == "name"}
-				style:grid-column={`${i + 2} / ${i + 3}`}
+				style:grid-column={`${i + 2 - (showCheckboxes ? 0 : 1)} / ${i + 3 - (showCheckboxes ? 0 : 1)}`}
 			>
 				{#if field.key}
 					{#if field.key == "updated_at"}
@@ -83,7 +99,6 @@
 							month: "long",
 							day: "numeric",
 						})}
-						
 					{:else if field.key == "publish_date"}
 						{new Date(data[field.key]).toLocaleString("en-US", {
 							year: "numeric",
@@ -101,7 +116,7 @@
 							/{data[field.key]}
 						</span>
 					{:else if data[field.key] == null || data[field.key].length == 0}
-							<NullMarker></NullMarker>
+						<NullMarker></NullMarker>
 					{:else}
 						{data[field.key]}
 					{/if}
@@ -117,11 +132,16 @@
 {#if data != null}
 	<div class="admin-grid" style:grid-template-columns={columnWidths}>
 		<div class="admin-grid-row admin-grid-header" style:grid-row={`1 / 2`}>
-			<div class="admin-grid-cell" style:grid-column={`1 / 2`}>
-				<TriStateCheckboxInput onChangeMain={onMainCheckChange} bind:checkState={mainCheckState} />
-			</div>
+			{#if showCheckboxes}
+				<div class="admin-grid-cell" style:grid-column={`1 / 2`}>
+					<TriStateCheckboxInput
+						onChangeMain={onMainCheckChange}
+						bind:checkState={mainCheckState}
+					/>
+				</div>
+			{/if}
 			{#each displayFields as field, i}
-				<div class="admin-grid-cell" style:grid-column={`${i + 2} / ${i + 3}`}>
+				<div class="admin-grid-cell" style:grid-column={`${i + 2 - (showCheckboxes ? 0 : 1)} / ${i + 3 - (showCheckboxes ? 0 : 1)}`}>
 					{field.label}
 				</div>
 			{/each}

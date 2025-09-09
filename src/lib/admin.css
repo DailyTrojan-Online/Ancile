@@ -5,16 +5,20 @@
     --accent: #990000;
     --secondary-accent: #FFCC00;
     --accent-bg: #ffeaea;
+    --border: rgba(0, 0, 0, 0.094);
 }
 body, html {
     overflow: hidden;
+}
+h1, h2, h3 {
+    user-select: none;
 }
 .admin-sidebar {
     width: 180px;
     height: 100%;
     background-color: #fff;
     box-sizing: border-box;
-    border-right: 1px solid rgba(0, 0, 0, 0.094);
+    border-right: 1px solid var(--border);
     flex-shrink: 0;
     position: relative;
     gap: 10px;
@@ -57,7 +61,7 @@ body, html {
     flex-shrink: 0;
 }
 .logo {
-    border-bottom: 1px solid  rgba(0, 0, 0, 0.094);;
+    border-bottom: 1px solid  var(--border);;
     padding: 0 12px;
     height: 60px;
 }
@@ -103,7 +107,7 @@ body, html {
     height: 1px;
     width: 88%;
     margin: 10px auto;
-    background: rgba(0, 0, 0, 0.094);
+    background: var(--border);
 }
 a {
     text-decoration: none;
@@ -124,17 +128,17 @@ a {
     flex-shrink: 0;
 }
 .admin-page-footer {
-    border-top: 1px solid rgba(0, 0, 0, 0.094);
+    border-top: 1px solid var(--border);
 }
 .admin-page-header {
 
-    border-bottom: 1px solid rgba(0, 0, 0, 0.094);
+    border-bottom: 1px solid var(--border);
 }
 
 .admin-page-header h1, .admin-page-footer h1 {
     margin: 0;
-    font-size: 16px;
-    font-weight: 400;
+    font-size: 18px;
+    font-weight: 500;
     text-transform: capitalize;
 }
 .admin-buttons {
@@ -183,6 +187,40 @@ a {
     margin-right: -2px;
 }
 
+.admin-grid-button {
+    padding: 0 12px;
+    height: 30px;
+    border: none;
+    border-radius: 8px;
+    background: var(--accent);
+    color: white;
+    cursor: pointer;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;    
+    border:1px solid #dcdde0;
+    position: relative;
+
+}
+.admin-grid-button * {
+}
+.admin-grid-button i {
+    font-size: 20px;
+    margin-left: -4px;
+}
+
+.admin-grid-button:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}
+
+.admin-grid-button i:first-child {
+    margin-left: -4px;
+    margin-right: -2px;
+}
+
 .button-icon {
     width: 40px; height: 40px;
 }
@@ -221,6 +259,16 @@ a {
     gap: 10px;
 }
 
+.flex-right {
+    width: 100%;
+    justify-content: flex-end;
+}
+
+
+.admin-buttons {
+    height: 100%;
+}
+
 .admin-modal {
     position: fixed;
     top: 0;
@@ -229,7 +277,7 @@ a {
     height: 100%;
     background: rgba(0, 0, 0, 0.297);
     z-index: 90909090;
-    animation: 0.2s modal-fade-in;
+    animation: .2s modal-fade-in;
     animation-fill-mode: forwards;
 }
 
@@ -237,7 +285,6 @@ a {
     animation: 0.4s modal-fade-out;
 }
 .admin-modal-content {
-
     width: 100%;
     flex-shrink: 0;
     height: 100%;
@@ -247,8 +294,8 @@ a {
     border-radius: 7px;
     padding: 0;
     position: absolute;
-    width: calc(100vw - 100px);
-    height: calc(100vh - 100px);
+    max-width: calc(100vw - 100px);
+    max-height: calc(100vh - 100px);
     z-index: 9999999;
     box-sizing: border-box;
     overflow: hidden;
@@ -258,11 +305,11 @@ a {
 
 @keyframes modal-fade-in {
     0% {
-        background: rgba(0, 0, 0, 0);
+        opacity: 0;
     }
 
     100% {
-        background: rgba(0, 0, 0, 0.297);
+        opacity: 1;
     }
 }
 
@@ -303,6 +350,13 @@ a {
     color: var(--accent);
 }
 
+.admin-modal-action-button {
+    position:fixed;
+    top: 9px;
+    right: 20px;
+    z-index: 20;
+}
+
 .admin-editor {
     position: relative;
     width: 100%;
@@ -325,7 +379,7 @@ a {
     height: 100%;
     overscroll-behavior: none;
     touch-action: manipulation;
-    border: 1px solid rgba(0, 0, 0, 0.094);
+    border: 1px solid var(--border);
 }
 .admin-editor-sidebar-collapsed {
     width: 0px;
@@ -334,7 +388,7 @@ a {
     width: 280px;
     height: 100%;
     background: white;
-    border-left: 1px solid rgba(0, 0, 0, 0.094);
+    border-left: 1px solid var(--border);
     box-sizing: border-box;
     padding: 16px;
     padding-top: 0;
@@ -349,7 +403,7 @@ a {
 }
 .admin-editor-css-sidebar-inner {
     width: 480px !important;
-    border-right: 1px solid rgba(0, 0, 0, 0.094);
+    border-right: 1px solid var(--border);
 }
 
 .admin-editor-sidebar-section {
@@ -365,10 +419,9 @@ a {
     font-weight: 500;
     margin: 0;
     width: 100%;
-    padding-top: 20px;
     padding-bottom: 4px;
     text-transform: capitalize;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.094);
+    border-bottom: 1px solid var(--border);
     position: sticky;
     top: 0;
     background: white;
@@ -376,13 +429,70 @@ a {
     z-index: 10;
 }
 
-.admin-editor-metadata-label {
+.admin-editor-column .header-sticky {
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 10;
+    box-shadow: -10px 0 0 white, 10px 0 0 white;
+}
+
+.admin-editor-column h3 {
+    font-size: 16px;
+    font-weight: 500;
+    margin: 0;
+    width: 100%;
+    text-transform: capitalize;
+    top: 0;
+}
+
+.admin-editor-column p {
+    margin: 0;
+    margin-top: 6px;
+    font-size: 14px;
+    color: #6f7076;
+    padding-bottom: 4px;
+}
+
+.admin-editor-input-label {
     font-size: 12px;
     color: #6f7076;
     font-family: "Geist Mono";
     text-transform: uppercase;
     margin-bottom: 4px;
     flex-shrink: 0;
+    user-select: none;
+}
+
+.admin-editor-input-group-underline {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 12px;
+    padding-top: 12px;
+}
+.admin-editor-checkbox-list {
+    margin-top: -12px
+}
+
+.admin-editor-input-title {
+    font-size: 14px;
+    font-family: "Geist";
+    margin: 0px;
+    flex-shrink: 0;
+    user-select: none;
+    font-weight: 400;
+}
+.admin-editor-input-description {
+    font-size: 12px;
+    color: #6f7076;
+    font-family: "Geist";
+    margin: 0px;
+    flex-shrink: 0;
+    user-select: none;
+    line-height:1.1em;
+    margin-top:4px;
+}
+button, .button-sidebar {
+    user-select: none;
 }
 
 .admin-editor-metadata-id {
@@ -444,7 +554,7 @@ a {
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid rgba(0, 0, 0, 0.094);
+    border: 1px solid var(--border);
     cursor: pointer;
     background: transparent;
     padding: 0 !important;
@@ -491,7 +601,20 @@ a {
     border-radius: 5px;
     font-family: "Geist";
     transition: 0.05s border, 0.05s outline;
-    max-width: 250px;
+    flex-shrink: 1;
+}
+
+.admin-editor-input-dropdown{
+    width: 100%;
+    box-sizing: border-box;
+    padding: 6px 8px;
+    font-size: 14px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    font-family: "Geist";
+    transition: 0.05s border, 0.05s outline;
+    cursor: pointer;
+    background: white;
 }
 
 .admin-editor-chip-input {
@@ -539,23 +662,23 @@ a {
     text-transform: lowercase;
 }
 
-.admin-editor-metadata-group-horizontal {
+.admin-editor-input-group-horizontal {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
 } 
-.admin-editor-metadata-group-horizontal .admin-editor-metadata-label {
+.admin-editor-input-group-horizontal .admin-editor-input-label {
     margin: 0;
 }
-.admin-editor-metadata-group-horizontal .admin-editor-input {
+.admin-editor-input-group-horizontal .admin-editor-input {
     width: fit-content;
 }
 
-.admin-editor-metadata-group-error * {
+.admin-editor-input-group-error * {
     color: #c70000;
 }
 
-.admin-editor-metadata-group-error .admin-editor-input, .admin-editor-metadata-group-error .admin-editor-metadata-textarea {
+.admin-editor-input-group-error .admin-editor-input, .admin-editor-input-group-error .admin-editor-metadata-textarea {
     border: 1px solid #c70000;
     outline: 1px solid #c70000;
 }
@@ -651,12 +774,20 @@ a {
     display: contents;
 }
 .admin-grid-row:hover .admin-grid-cell {
-    background: #f2f2f4;
+    background: #f8f8f9;
     cursor: pointer;
 }
 .admin-grid-row:hover .admin-grid-emphasis {
     color: var(--accent);
     text-decoration: underline;
+}
+.admin-row-visible-on-hover {
+    opacity: 0;
+    pointer-events: none;
+}
+.admin-grid-row:hover .admin-row-visible-on-hover {
+    opacity: 1;
+    pointer-events: all;
 }
 
 .admin-grid-cell {
@@ -664,7 +795,7 @@ a {
     align-items: center;
     padding: 12px;
     color: #07072389;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.094);
+    border-bottom: 1px solid var(--border);
 }
 .admin-grid-header .admin-grid-cell {
     font-family: "Geist Mono";
@@ -904,7 +1035,15 @@ a {
     }
 }
 
-
+.user-role {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    text-transform: uppercase;
+    font-family: "Geist Mono";
+    opacity: 0.3;
+    user-select: none;
+}
 .admin-button-loading-spinner {
     display: flex;
     justify-content: center;
@@ -940,9 +1079,11 @@ a {
     display: flex;
     flex-shrink: 0;
     flex-direction: column;
-    padding-top: 0;
     gap: 20px;
-    border-left: 1px solid rgba(0, 0, 0, 0.094);
+    border-left: 1px solid var(--border);
+}
+.admin-editor-metadata-sidebar h2 {
+    padding-top: 20px;
 }
 
 .admin-editor-fullwidth {

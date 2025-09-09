@@ -23,19 +23,18 @@
 </script>
 
 <div class="admin-page-header">
-	<h1>Notifications</h1>
+	<h1>Breaking News Notifications</h1>
 </div>
 <div class="admin-editor-column">
-	<h2>Send Breaking News Notification</h2>
-	<div class="admin-editor-metadata-group">
-		<div class="admin-editor-metadata-label">Body Text</div>
+	<div class="admin-editor-input-group">
+		<div class="admin-editor-input-label">Body Text</div>
 		<input type="text" class="admin-editor-input" bind:value={body} />
 	</div>
-	<div class="admin-editor-metadata-group">
-		<div class="admin-editor-metadata-label">Article URL</div>
+	<div class="admin-editor-input-group">
+		<div class="admin-editor-input-label">Article URL</div>
 		<input type="url" class="admin-editor-input" bind:value={articleUrl} />
 	</div>
-	<div class="admin-editor-metadata-group">
+	<div class="admin-editor-input-group">
         <MediaLibraryInput bind:image={image} {supabase} />
 	</div>
 

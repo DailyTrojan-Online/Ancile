@@ -115,7 +115,7 @@
 	}
 </script>
 
-<div class="admin-page-content">
+<div class="admin-page-content admin-media-library-wrapper">
 	<div class="admin-page-header">
 		<div class="admin-buttons">
 			<h1>Media Library</h1>
@@ -183,14 +183,14 @@
 			<div class="admin-editor-column">
 				<h2>Image</h2>
 				<img src={selectedItem.url} alt={selectedItemName} />
-				<div class="admin-editor-metadata-group">
-					<div class="admin-editor-metadata-label">URL</div>
+				<div class="admin-editor-input-group">
+					<div class="admin-editor-input-label">URL</div>
 					<div class="admin-editor-metadata-id" use:copy={selectedItem.url}>
 						{selectedItem.url}
 					</div>
 				</div>
-				<div class="admin-editor-metadata-group">
-					<div class="admin-editor-metadata-label">Name</div>
+				<div class="admin-editor-input-group">
+					<div class="admin-editor-input-label">Name</div>
 					<input
 						class="admin-editor-input"
 						type="text"
@@ -214,6 +214,10 @@
 </div>
 
 <style>
+	.admin-media-library-wrapper {
+		width: 100%;
+		height: 100%;
+	}
 	.admin-editor-fullwidth {
 		padding-bottom: 100px;
 	}
