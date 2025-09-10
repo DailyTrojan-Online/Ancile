@@ -2,6 +2,7 @@
 	import AdminGrid from "$lib/components/AdminGrid.svelte";
 	import AdminModal from "$lib/components/AdminModal.svelte";
 	import CheckboxInput from "$lib/components/CheckboxInput.svelte";
+	import LoadingButton from "$lib/components/LoadingButton.svelte";
 	import MediaLibraryInput from "$lib/components/MediaLibraryInput.svelte";
 	import { getAllRoles } from "$lib/supabaseHelpers.js";
 	import { onMount } from "svelte";
@@ -40,7 +41,7 @@
 		},
 		{
 			label: "Permissions",
-			renderer: roleChipList
+			renderer: roleChipList,
 		},
 		{
 			label: "",
@@ -64,11 +65,18 @@
 		return roles;
 	}
 
-	onMount(async () => {
+	onMount(() => {
+		initData();
+	});
+
+	async function initData() {
+		accounts = null;
+		roles = null;
 		accounts = await fetchAccounts();
 		roles = await fetchRoles();
 		getAllPermissions();
-	});
+
+	}
 
 	let showInviteModal = $state(false);
 	let showUserManageModal = $state(false);
@@ -101,6 +109,55 @@
 			}
 		});
 		console.log(permissionsCategories);
+	}
+
+	let selectedUser: any = $state(null);
+	let selectedUserName = $state("");
+	let selectedUserRole = $state("");
+
+	function selectUser(user: any) {
+		selectedUser = user;
+		console.log(selectedUser)
+		selectedUserRole = user.roles[0]?.name ?? "";
+		console.log(selectedUserRole)
+		showUserManageModal = true;
+		selectedUserName = user.name ?? "";
+	}
+
+	let userLoading = $state(false);
+
+	async function saveUserChanges() {
+		//first we need to delete anything in the user_roles table for this user
+		userLoading = true;
+		if(!selectedUser) {userLoading = false; return;}
+		console.log(selectedUser)
+		let {data, error} = await supabase.from("user_roles").delete().eq("user_id", selectedUser.user_id);
+		console.log(data, error);
+		if(error) {
+			console.error(error);
+			userLoading = false; 
+			return;
+		}
+		//now we need to insert new role
+		console.log(roles)
+		let {data: roleData, error: roleError} = await supabase.from("user_roles").upsert({
+			user_id: selectedUser.user_id,
+			role_id: roles.find((r: any) => r.name == selectedUserRole)?.id
+		})
+		console.log(roleData, roleError);
+		if(roleError) {
+			console.error(roleError);
+			userLoading = false; 
+			return;
+		}
+		//now, update selected user
+		let {data: userData, error: userError} = await supabase.from("admin_users").update({
+			name: selectedUserName
+		}).eq("user_id", selectedUser.user_id);
+		console.log(userData, userError);
+		showUserManageModal = false;
+		userLoading = false; 
+		initData();
 	}
 </script>
 
@@ -163,9 +220,7 @@
 				<AdminGrid
 					{displayFields}
 					showCheckboxes={false}
-					callback={() => {
-						showUserManageModal = true;
-					}}
+					callback={selectUser}
 					data={accounts}
 					columnWidths={"250px 200px 180px 1fr"}
 				></AdminGrid>
@@ -173,11 +228,9 @@
 				<AdminGrid
 					displayFields={displayFieldsRoles}
 					showCheckboxes={false}
-					callback={() => {
-						showUserManageModal = true;
-					}}
+					callback={()=>{}}
 					data={roles}
-					columnWidths={"250px 400px 1fr"}
+					columnWidths={"250px 600px 1fr"}
 				></AdminGrid>
 			{/if}
 		</div>
@@ -204,22 +257,23 @@
 </AdminModal>
 <AdminModal bind:open={showUserManageModal}>
 	<div class="admin-modal-content right-modal">
-		<button class="admin-button admin-modal-action-button">Save</button>
+		<!-- <button class="admin-button admin-modal-action-button" onclick={saveUserChanges}>Save</button> -->
+		<LoadingButton classes="admin-button admin-modal-action-button" loading={userLoading} onclick={saveUserChanges}>Save</LoadingButton>
 		<div class="admin-editor-column admin-editor-sidebar-inner">
 			<div class="admin-editor-sidebar-section">
 				<h2>Edit User</h2>
 
 				<div class="admin-editor-input-group">
 					<div class="admin-editor-input-label">Display Name</div>
-					<input type="email" class="admin-editor-input" />
+					<input type="email" class="admin-editor-input" bind:value={selectedUserName}/>
 				</div>
 
 				<div class="admin-editor-input-group">
 					<div class="admin-editor-input-label">Role</div>
-					<select class="admin-editor-input-dropdown">
-						<option value="editor">Editor</option>
-						<option value="admin">Admin</option>
-						<option value="owner">Owner</option>
+					<select class="admin-editor-input-dropdown" bind:value={selectedUserRole}>
+						{#each roles as role}
+							<option value={role.name}>{role.name}</option>
+						{/each}
 					</select>
 				</div>
 			</div>

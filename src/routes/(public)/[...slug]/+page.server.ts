@@ -36,6 +36,10 @@ export const load: PageServerLoad = async ({ locals: { supabase, session }, para
 			}
 		}
 	}
+	if(!page.content || !page.content.content) {
+		error(500, 'Internal server error');
+
+	}
 	findPostBlocks(page.content.content);
 	let postBlockQueryResults: {id: string, posts: any[]}[] = foundPostBlocks.map((block) => {return {id: block.id, posts: []}});
 	console.log('Found Post Blocks:', foundPostBlocks);

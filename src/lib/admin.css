@@ -280,10 +280,6 @@ a {
     animation: .2s modal-fade-in;
     animation-fill-mode: forwards;
 }
-
-.admin-modal-out {
-    animation: 0.4s modal-fade-out;
-}
 .admin-modal-content {
     width: 100%;
     flex-shrink: 0;
@@ -313,15 +309,6 @@ a {
     }
 }
 
-@keyframes modal-fade-out {
-    0% {
-        background: rgba(0, 0, 0, 0.297);
-    }
-
-    100% {
-        background: rgba(0, 0, 0, 0);
-    }
-}
 
 .admin-header-tame-button {
     border: none;
@@ -351,7 +338,7 @@ a {
 }
 
 .admin-modal-action-button {
-    position:fixed;
+    position:fixed !important;
     top: 9px;
     right: 20px;
     z-index: 20;

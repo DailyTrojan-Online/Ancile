@@ -113,6 +113,7 @@ export async function getAllRoles(supabase: SupabaseClient) {
 	const { data, error } = await supabase.from("roles").select(`
         name,
         description,
+		id,
         role_permissions(
           permission_key,
           value,
