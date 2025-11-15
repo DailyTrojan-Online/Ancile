@@ -8,8 +8,10 @@ It is responsible for the following:
 
 The grid system can be treated similar to a single column, 
 */
+import { openModal } from "$lib/modalManager.svelte";
 import { computePosition } from "@floating-ui/core";
 import { platform, flip, offset, shift } from "@floating-ui/dom";
+import type { Component } from "svelte";
 type AnyBlock = typeof Block;
 type BlockPositionContext = {
 	parent: Lithograph | Block;
@@ -25,6 +27,8 @@ export type BlockSaveData<T> = {
 	type: string;
 	id: string;
 	data: T;
+	classes: string,
+	html_id: string,
 };
 export class Lithograph {
 	container: HTMLElement;
@@ -84,8 +88,7 @@ export class Lithograph {
 
 		this.previewWindow = document.createElement("div");
 		this.previewWindow.classList.add("led-preview");
-		if(this.enablePreview)
-			this.container.appendChild(this.previewWindow);
+		if (this.enablePreview) this.container.appendChild(this.previewWindow);
 
 		if (configuration.data != null) {
 			configuration.data.content.forEach((blockData) => {
@@ -978,6 +981,10 @@ export class Block {
 
 	validFocusElements: HTMLElement[] = [];
 
+	settingsComponent: Component<Block> | null = null;
+	classes: string = "";
+	htmlId: string = "";
+
 	constructor(editor: Lithograph, parent: Block | null) {
 		this.editor = editor;
 		this.parent = parent ?? editor;
@@ -1002,6 +1009,7 @@ export class Block {
 		this.titleElement = document.createElement("div");
 		this.titleElement.classList.add("led-block-title");
 		this.titleElement.innerText = this.title;
+		this.topBar.title = this.title + " Block";
 
 		this.leftButtonContainer = document.createElement("div");
 		this.leftButtonContainer.classList.add("led-block-left-button-container");
@@ -1013,6 +1021,19 @@ export class Block {
 		buttons.forEach((button) => {
 			this.leftButtonContainer.appendChild(button);
 		});
+
+		let settingsButton = document.createElement("button");
+		settingsButton.innerHTML = `<i class="ti ti-pencil"></i>`;
+		settingsButton.classList.add("led-top-bar-button");
+		settingsButton.onclick = () => {
+			let modal = this.getSettingsModal()
+			if (modal != null) {
+				openModal(modal, "component", "center", {
+					block: this,
+				});
+			}
+		};
+		this.leftButtonContainer.appendChild(settingsButton);
 
 		let deleteButton = document.createElement("button");
 		deleteButton.innerHTML = `<i class="ti ti-trash"></i>`;
@@ -1251,11 +1272,27 @@ export class Block {
 			type: "blank",
 			id: "NO_ID",
 			data: {},
+			classes: this.classes,
+			html_id: this.htmlId
 		};
 	}
 
 	render() {
 		return `[ERROR] This [${this.title}] block does not have a render method!`;
+	}
+
+	getSettingsModal(): Component<any> | null {
+		console.warn(
+			`[WARNING] This [${this.title}] block does not have a settings modal!`
+		);
+		return null;
+	}
+
+	setCSSClasses(classes: string) {
+		this.classes = classes;
+	}
+	setHtmlId(id: string) {
+		this.htmlId = id;
 	}
 }
 

@@ -1,7 +1,10 @@
+import ImageSettings from "$lib/components/LithographSettings/ImageSettings.svelte";
+import { openModal } from "$lib/modalManager.svelte";
 import { Block, Lithograph, type BlockSaveData } from "../lithograph";
 
 export type ImageBlockSaveData = {
 	url: string;
+	alt: string;
 }
 
 export class ImageBlock extends Block {
@@ -44,7 +47,19 @@ export class ImageBlock extends Block {
 			id: this.id,
 			data: {
 				url: this.image,
+				alt: ""
 			},
+            html_id: this.htmlId,
+            classes: this.classes
 		}
+	}
+
+	setUrl(url: string) {
+		this.image = url;
+		this.previewElement.src = this.image;
+	}
+
+	getSettingsModal() {
+		return ImageSettings;
 	}
 }

@@ -349,12 +349,14 @@
 				{supabase}
 			/>
 			{#if previewing}
+			<main class="page-root">
 			{@html "<style>" + pageCSS + "</style>"}
 				<PageRenderer
 					content={pageRendererData}
 					injectCSS={false}
 					settings={pageSettings}
 				></PageRenderer>
+			</main>
 			{/if}
 		</div>
 

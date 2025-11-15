@@ -1,7 +1,10 @@
-<script>
-  import AuthUi from "$lib/components/AuthUI.svelte";
-	let reset = false;
+<script lang="ts">
+	import AuthUi from "$lib/components/AuthUI.svelte";
+	import type { ActionData } from "./$types";
+	let reset = $state(false);
+	let { form }: { form: ActionData } = $props();
 </script>
+
 <AuthUi>
 	{#if !reset}
 		<h1>Login</h1>
@@ -14,9 +17,10 @@
 				Password
 				<input name="password" type="password" />
 			</label>
+			{#if form?.error}<p class="admin-auth-error">{form?.error}</p>{/if}
 			<button type="submit"> Login </button>
 		</form>
-		<button class="button-secondary" on:click={() => (reset = true)}
+		<button class="button-secondary" onclick={() => (reset = true)}
 			>Forgot Password? <u>Reset</u></button
 		>
 	{:else}
@@ -28,8 +32,8 @@
 			</label>
 			<button type="submit"> Reset Password </button>
 		</form>
-		<button class="button-secondary" on:click={() => (reset = true)}
+		<button class="button-secondary" onclick={() => (reset = true)}
 			>Log In</button
 		>
 	{/if}
-  </AuthUi>
+</AuthUi>

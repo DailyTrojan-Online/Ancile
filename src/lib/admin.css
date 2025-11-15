@@ -1,18 +1,18 @@
-
 :root {
     --accent: #f3008a;
     --accent-bg: #ffeaf7;
     --accent: #990000;
     --secondary-accent: #FFCC00;
     --accent-bg: #ffeaea;
-    --border: rgba(0, 0, 0, 0.094);
+    --border: rgba(0, 0, 0, 0.12);
 }
-body, html {
+
+body,
+html {
     overflow: hidden;
 }
-h1, h2, h3 {
-    user-select: none;
-}
+
+
 .admin-sidebar {
     width: 180px;
     height: 100%;
@@ -24,6 +24,7 @@ h1, h2, h3 {
     gap: 10px;
     overflow: hidden;
 }
+
 .admin-sidebar .logo svg {
     width: 100%;
     height: 100%;
@@ -50,9 +51,12 @@ h1, h2, h3 {
     box-sizing: border-box;
     flex-shrink: 0;
 }
-.logo *, .button-sidebar * {
+
+.logo *,
+.button-sidebar * {
     flex-shrink: 0;
 }
+
 .button-wrapper {
     width: 100%;
     box-sizing: border-box;
@@ -60,16 +64,20 @@ h1, h2, h3 {
     margin: 5px 0;
     flex-shrink: 0;
 }
+
 .logo {
-    border-bottom: 1px solid  var(--border);;
+    border-bottom: 1px solid var(--border);
+    ;
     padding: 0 12px;
     height: 60px;
 }
+
 .logo *,
 .button-sidebar * {
     margin: 0;
     padding: 0;
 }
+
 .logo i,
 .button-sidebar i {
     font-size: 26px;
@@ -79,6 +87,7 @@ h1, h2, h3 {
     align-items: center;
     justify-content: center;
 }
+
 .logo p {
     font-size: 20px;
     font-weight: 600;
@@ -95,26 +104,24 @@ h1, h2, h3 {
     cursor: pointer;
     border-radius: 8px;
 }
+
 .button-sidebar-active,
 .button-sidebar:hover {
     background: var(--accent-bg);
     color: var(--accent);
 }
+
 .gap {
-    height:5px;
+    height: 5px;
 }
-.divider {
-    height: 1px;
-    width: 88%;
-    margin: 10px auto;
-    background: var(--border);
-}
+
 a {
     text-decoration: none;
     color: inherit;
 }
 
-.admin-page-header, .admin-page-footer {
+.admin-page-header,
+.admin-page-footer {
     width: 100%;
     background-color: #ffffff;
     box-sizing: border-box;
@@ -127,20 +134,24 @@ a {
     top: 0;
     flex-shrink: 0;
 }
+
 .admin-page-footer {
     border-top: 1px solid var(--border);
 }
-.admin-page-header {
 
+.admin-page-header {
     border-bottom: 1px solid var(--border);
+    position: relative;
 }
 
-.admin-page-header h1, .admin-page-footer h1 {
+.admin-page-header h1,
+.admin-page-footer h1 {
     margin: 0;
     font-size: 18px;
     font-weight: 500;
     text-transform: capitalize;
 }
+
 .admin-buttons {
     display: flex;
     align-items: center;
@@ -148,12 +159,15 @@ a {
     width: 100%;
     flex-shrink: 1;
 }
+
 .admin-buttons * {
     flex-shrink: 0;
 }
+
 .admin-page-header-left {
     justify-content: end;
 }
+
 .admin-button {
     padding: 0 20px;
     height: 40px;
@@ -166,12 +180,12 @@ a {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;    
+    gap: 10px;
     position: relative;
+}
 
-}
-.admin-button * {
-}
+.admin-button * {}
+
 .admin-button i {
     font-size: 20px;
     margin-left: -4px;
@@ -199,13 +213,13 @@ a {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;    
-    border:1px solid #dcdde0;
+    gap: 10px;
+    border: 1px solid #dcdde0;
     position: relative;
+}
 
-}
-.admin-grid-button * {
-}
+.admin-grid-button * {}
+
 .admin-grid-button i {
     font-size: 20px;
     margin-left: -4px;
@@ -222,13 +236,15 @@ a {
 }
 
 .button-icon {
-    width: 40px; height: 40px;
+    width: 40px;
+    height: 40px;
 }
 
 .button-primary {
     background: var(--accent);
     color: white;
 }
+
 .button-primary:hover {
     background: #aa2222;
 }
@@ -237,6 +253,7 @@ a {
     background: var(--secondary-accent);
     color: black;
 }
+
 .button-secondary:hover {
     background: #ffd736;
 }
@@ -245,6 +262,7 @@ a {
     background: #e9eaec;
     color: #51525a;
 }
+
 .button-sub:hover {
     background: #dcdde0;
 }
@@ -264,7 +282,6 @@ a {
     justify-content: flex-end;
 }
 
-
 .admin-buttons {
     height: 100%;
 }
@@ -280,6 +297,7 @@ a {
     animation: .2s modal-fade-in;
     animation-fill-mode: forwards;
 }
+
 .admin-modal-content {
     width: 100%;
     flex-shrink: 0;
@@ -295,8 +313,16 @@ a {
     z-index: 9999999;
     box-sizing: border-box;
     overflow: hidden;
-    left: 50%; top: 50%;
+    left: 50%;
+    top: 50%;
+    pointer-events: all !important;
     transform: translate(-50%, -50%);
+}
+
+.admin-modal-close-button {
+    position: absolute;
+    right: 10px;
+    top: 10px;
 }
 
 @keyframes modal-fade-in {
@@ -309,36 +335,40 @@ a {
     }
 }
 
-
 .admin-header-tame-button {
     border: none;
     background: transparent;
     cursor: pointer;
-    width: 40px; height: 40px;
+    width: 40px;
+    height: 40px;
     font-size: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 50%;
 }
+
 .admin-header-circle-button {
     border: none;
     background: transparent;
     cursor: pointer;
-    width: 40px; height: 40px;
+    width: 40px;
+    height: 40px;
     font-size: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 8px;
 }
-.admin-header-tame-button:hover, .admin-header-circle-button:hover {
+
+.admin-header-tame-button:hover,
+.admin-header-circle-button:hover {
     background: var(--accent-bg);
     color: var(--accent);
 }
 
 .admin-modal-action-button {
-    position:fixed !important;
+    position: fixed !important;
     top: 9px;
     right: 20px;
     z-index: 20;
@@ -352,12 +382,14 @@ a {
     display: flex;
     justify-content: center;
 }
+
 .admin-editor-sidebar {
     width: 280px;
     height: 100%;
     overflow: hidden;
     flex-shrink: 0;
 }
+
 .admin-editor-css-sidebar {
     width: 480px;
 }
@@ -368,9 +400,11 @@ a {
     touch-action: manipulation;
     border: 1px solid var(--border);
 }
+
 .admin-editor-sidebar-collapsed {
     width: 0px;
 }
+
 .admin-editor-sidebar-inner {
     width: 280px;
     height: 100%;
@@ -388,6 +422,7 @@ a {
     overflow-y: auto;
     padding-bottom: 100px;
 }
+
 .admin-editor-css-sidebar-inner {
     width: 480px !important;
     border-right: 1px solid var(--border);
@@ -398,10 +433,10 @@ a {
     flex-direction: column;
     gap: 20px;
     flex-shrink: 0;
-
 }
 
-.admin-editor-sidebar-inner h2, .admin-editor-column h2 {
+.admin-editor-sidebar-inner h2,
+.admin-editor-column h2 {
     font-size: 18px;
     font-weight: 500;
     margin: 0;
@@ -456,6 +491,7 @@ a {
     padding-bottom: 12px;
     padding-top: 12px;
 }
+
 .admin-editor-checkbox-list {
     margin-top: -12px
 }
@@ -468,6 +504,7 @@ a {
     user-select: none;
     font-weight: 400;
 }
+
 .admin-editor-input-description {
     font-size: 12px;
     color: #6f7076;
@@ -475,10 +512,12 @@ a {
     margin: 0px;
     flex-shrink: 0;
     user-select: none;
-    line-height:1.1em;
-    margin-top:4px;
+    line-height: 1.1em;
+    margin-top: 4px;
 }
-button, .button-sidebar {
+
+button,
+.button-sidebar {
     user-select: none;
 }
 
@@ -494,6 +533,7 @@ button, .button-sidebar {
     margin-bottom: 4px;
     cursor: pointer;
 }
+
 .admin-editor-metadata-date {
     font-size: 14px;
     background: #e8e9ec;
@@ -504,6 +544,7 @@ button, .button-sidebar {
     transition: background 0.2s;
     position: relative;
 }
+
 .admin-editor-metadata-date:hover {
     background: #cbcccf;
 }
@@ -515,6 +556,7 @@ button, .button-sidebar {
     opacity: 0;
     transition: opacity 0.2s
 }
+
 .admin-editor-metadata-date input {
     position: absolute;
     top: 0;
@@ -551,10 +593,9 @@ button, .button-sidebar {
     position: absolute;
     top: 50%;
     left: 50%;
-    padding:8px 16px;
+    padding: 8px 16px;
     text-wrap: nowrap;
     transform: translate(-50%, -50%);
-    
     background: #ffffff;
     display: flex;
     border: 1px solid rgba(0, 0, 0, 0.193);
@@ -563,18 +604,22 @@ button, .button-sidebar {
     border-radius: 5px;
     cursor: pointer;
 }
+
 .admin-editor-metadata-featured-image-preview {
     width: 100%;
     height: 100%;
     object-fit: cover;
     border: none !important
 }
+
 .admin-editor-metadata-featured-image-button-exist {
     opacity: 0;
 }
+
 .admin-editor-metadata-featured-image:hover .admin-editor-metadata-featured-image-button {
     opacity: 1;
 }
+
 .admin-editor-metadata-featured-image:hover .admin-editor-metadata-featured-image-preview {
     opacity: 0.5;
 }
@@ -591,7 +636,7 @@ button, .button-sidebar {
     flex-shrink: 1;
 }
 
-.admin-editor-input-dropdown{
+.admin-editor-input-dropdown {
     width: 100%;
     box-sizing: border-box;
     padding: 6px 8px;
@@ -613,16 +658,19 @@ button, .button-sidebar {
     overflow: hidden;
 }
 
-.admin-editor-input:hover, .admin-editor-metadata-textarea:hover {
+.admin-editor-input:hover,
+.admin-editor-metadata-textarea:hover {
     border: 1px solid var(--accent);
     outline: 1px solid var(--accent);
 }
 
-.admin-editor-input:focus, .admin-editor-input:active, .admin-editor-metadata-textarea:focus, .admin-editor-metadata-textarea:active {
+.admin-editor-input:focus,
+.admin-editor-input:active,
+.admin-editor-metadata-textarea:focus,
+.admin-editor-metadata-textarea:active {
     border: 1px solid var(--accent);
     outline: 2px solid var(--accent);
 }
-
 
 .admin-editor-metadata-textarea {
     width: 100%;
@@ -644,6 +692,7 @@ button, .button-sidebar {
     gap: 4px;
     align-items: center;
 }
+
 .admin-editor-metadata-slug .admin-editor-input {
     padding: 5px 6px;
     text-transform: lowercase;
@@ -653,10 +702,12 @@ button, .button-sidebar {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-} 
+}
+
 .admin-editor-input-group-horizontal .admin-editor-input-label {
     margin: 0;
 }
+
 .admin-editor-input-group-horizontal .admin-editor-input {
     width: fit-content;
 }
@@ -665,10 +716,17 @@ button, .button-sidebar {
     color: #c70000;
 }
 
-.admin-editor-input-group-error .admin-editor-input, .admin-editor-input-group-error .admin-editor-metadata-textarea {
+.admin-editor-input-group-error .admin-editor-input,
+.admin-editor-input-group-error .admin-editor-metadata-textarea {
     border: 1px solid #c70000;
     outline: 1px solid #c70000;
 }
+
+.admin-editor-input-group {
+    max-width: 300px;
+    width: 100%;
+}
+
 .admin-editor-error {
     color: #c70000;
     font-size: 14px;
@@ -679,7 +737,6 @@ button, .button-sidebar {
     padding: 6px 12px;
     box-sizing: border-box;
 }
-
 
 .admin-color-input-wrapper {
     display: flex;
@@ -703,7 +760,9 @@ button, .button-sidebar {
 .admin-checkbox-wrapper input {
     display: none;
 }
-.admin-checkbox-check, .admin-checkbox-indeterminate {
+
+.admin-checkbox-check,
+.admin-checkbox-indeterminate {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -717,21 +776,25 @@ button, .button-sidebar {
     justify-content: center;
     align-items: center;
     color: transparent;
-    transition:border 0.05s, outline 0.05s, background-color 0.1s, color 0.1s;
+    transition: border 0.05s, outline 0.05s, background-color 0.1s, color 0.1s;
     font-size: 18px;
     background-color: transparent;
     color: transparent;
     z-index: 0;
 }
-.admin-checkbox-wrapper:hover input ~ .admin-checkbox-check {
+
+.admin-checkbox-wrapper:hover input~.admin-checkbox-check {
     border: 1px solid var(--accent);
     outline: 1px solid var(--accent);
 }
-.admin-checkbox-wrapper:active input ~ .admin-checkbox-check {
+
+.admin-checkbox-wrapper:active input~.admin-checkbox-check {
     border: 1px solid var(--accent);
     outline: 2px solid var(--accent);
 }
-.admin-checkbox-wrapper input:checked ~ .admin-checkbox-check, .admin-checkbox-wrapper-indeterminate .admin-checkbox-indeterminate {
+
+.admin-checkbox-wrapper input:checked~.admin-checkbox-check,
+.admin-checkbox-wrapper-indeterminate .admin-checkbox-indeterminate {
     background-color: var(--accent);
     color: white;
 }
@@ -757,21 +820,26 @@ button, .button-sidebar {
     box-sizing: border-box;
     padding-bottom: 100px;
 }
+
 .admin-grid-row {
     display: contents;
 }
+
 .admin-grid-row:hover .admin-grid-cell {
     background: #f8f8f9;
     cursor: pointer;
 }
+
 .admin-grid-row:hover .admin-grid-emphasis {
     color: var(--accent);
     text-decoration: underline;
 }
+
 .admin-row-visible-on-hover {
     opacity: 0;
     pointer-events: none;
 }
+
 .admin-grid-row:hover .admin-row-visible-on-hover {
     opacity: 1;
     pointer-events: all;
@@ -784,6 +852,7 @@ button, .button-sidebar {
     color: #07072389;
     border-bottom: 1px solid var(--border);
 }
+
 .admin-grid-header .admin-grid-cell {
     font-family: "Geist Mono";
     text-transform: uppercase;
@@ -798,11 +867,14 @@ button, .button-sidebar {
 .admin-grid-emphasis {
     color: black;
 }
+
 .admin-grid-emphasis:hover {
     text-decoration: underline;
 }
 
-.admin-grid-status-draft, .admin-grid-status-published, .admin-grid-status-scheduled {
+.admin-grid-status-draft,
+.admin-grid-status-published,
+.admin-grid-status-scheduled {
     padding: 5px 10px;
     border-radius: 4px;
     font-size: 12px;
@@ -810,7 +882,9 @@ button, .button-sidebar {
     display: inline-block;
 }
 
-.admin-grid-status-draft, .admin-grid-status-published, .admin-grid-status-scheduled {
+.admin-grid-status-draft,
+.admin-grid-status-published,
+.admin-grid-status-scheduled {
     user-select: none;
 }
 
@@ -820,6 +894,7 @@ button, .button-sidebar {
     text-decoration: none !important;
     text-decoration-style: none !important;
 }
+
 .admin-grid-status-scheduled {
     color: white;
     background: #1a73e8;
@@ -842,13 +917,15 @@ button, .button-sidebar {
     grid-column: 1 / -1;
     max-width: 100%;
 }
+
 .admin-grid-loader i {
     font-size: 30px;
     color: var(--accent);
 }
 
-.ti-loader-2 , .spin{
-    animation: rotate 1s cubic-bezier(.19,.74,.83,.55) infinite;
+.ti-loader-2,
+.spin {
+    animation: rotate 1s cubic-bezier(.19, .74, .83, .55) infinite;
 }
 
 .admin-chip-list {
@@ -858,7 +935,7 @@ button, .button-sidebar {
     align-items: center;
     overflow: hidden;
     width: 100%;
-    mask-image: linear-gradient(to right,  black, black calc(100% - 30px), transparent);
+    mask-image: linear-gradient(to right, black, black calc(100% - 30px), transparent);
 }
 
 .admin-chip {
@@ -877,6 +954,7 @@ button, .button-sidebar {
     0% {
         transform: rotate(0deg);
     }
+
     100% {
         transform: rotate(360deg);
     }
@@ -900,19 +978,21 @@ button, .button-sidebar {
     align-items: center;
     justify-content: center;
 }
+
 .admin-header-bar-area-left {
     justify-content: start;
 }
+
 .admin-header-bar-area-right {
     justify-content: end;
 }
-
 
 .admin-header-bar-scheduled {
     background: repeating-linear-gradient(45deg, #1a73e8, #1a73e8 10px, #1465e7 10px, #1465e7 20px);
     box-shadow: inset 0 -10px 20px 0 rgba(4, 26, 86, 0.223);
     color: white;
 }
+
 .admin-header-bar-draft {
     background: repeating-linear-gradient(45deg, #ff9900, #ff9900 10px, #ffae00 10px, #ffae00 20px);
     box-shadow: inset 0 -10px 20px 0 rgba(86, 37, 4, 0.097);
@@ -924,11 +1004,6 @@ button, .button-sidebar {
     flex-direction: column;
     height: 100%;
 }
-
-
-
-
-
 
 .auth-form-container {
     width: 500px;
@@ -944,7 +1019,6 @@ button, .button-sidebar {
 }
 
 .auth-form-logo {
-
     display: flex;
     justify-content: flex-start;
     margin-bottom: 20px;
@@ -978,7 +1052,7 @@ button, .button-sidebar {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    color: #6f7076  
+    color: #6f7076
 }
 
 .auth-form-container button {
@@ -993,6 +1067,7 @@ button, .button-sidebar {
     cursor: pointer;
     margin-top: 10px;
 }
+
 .auth-form-container button.button-secondary {
     color: var(--accent);
     border: none;
@@ -1003,10 +1078,16 @@ button, .button-sidebar {
     background: var(--accent);
     color: white;
 }
+
 .auth-form-container button:disabled {
     background: #c3c4c9;
     color: white;
     cursor: not-allowed;
+}
+
+.admin-auth-error {
+    color: red;
+    margin: 0;
 }
 
 @media (max-width: 600px) {
@@ -1031,6 +1112,7 @@ button, .button-sidebar {
     opacity: 0.3;
     user-select: none;
 }
+
 .admin-button-loading-spinner {
     display: flex;
     justify-content: center;
@@ -1038,7 +1120,7 @@ button, .button-sidebar {
     z-index: 100;
     pointer-events: none;
     width: 40px;
-     height: 40px;
+    height: 40px;
 }
 
 .admin-button-loading-spinner i {
@@ -1054,21 +1136,22 @@ button, .button-sidebar {
     pointer-events: none;
 }
 
-.admin-tag-sidebar {
-
-}
+.admin-tag-sidebar {}
 
 .admin-editor-column {
     padding: 20px;
-    width: 100%;
+    /* width: 100%; */
+    width: fit-content;
     box-sizing: border-box;
-    max-width: 340px;
+    /* max-width: 340px; */
     display: flex;
     flex-shrink: 0;
     flex-direction: column;
     gap: 20px;
     border-left: 1px solid var(--border);
+    min-width: 340px;
 }
+
 .admin-editor-metadata-sidebar h2 {
     padding-top: 20px;
 }
@@ -1098,6 +1181,7 @@ button, .button-sidebar {
     opacity: 0;
     transition: 0.075s opacity;
 }
+
 .admin-editor-popover-show {
     pointer-events: all;
     opacity: 1;
@@ -1105,4 +1189,87 @@ button, .button-sidebar {
 
 :where([data-sonner-toaster]) {
     position: absolute !important;
+}
+
+.invite-modal {
+    width: 350px !important;
+    height: fit-content;
+}
+
+.right-modal {
+    width: 500px !important;
+    height: 100vh !important;
+    max-height: unset !important;
+    border-radius: 0 !important;
+    transform: translate(0, -50%);
+    animation: 0.2s slide-in;
+    right: 0 !important;
+    left: unset !important;
+}
+
+@keyframes slide-in {
+    from {
+        transform: translate(40px, -50%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translate(0, -50%);
+        opacity: 1;
+    }
+}
+
+.admin-editor-column {
+    /* border: none; */
+    padding-top: 0;
+}
+
+.admin-editor-column-noborder {
+    border: none;
+}
+.admin-editor-column-fullwidth {
+    width: 100%;
+    flex-shrink: 1;
+}
+
+.admin-editor-column h2 {
+    padding-top: 20px;
+    padding-bottom: 15px;
+}
+
+.right-modal .admin-editor-column {
+    max-width: unset;
+}
+
+.admin-editor-tab-selector {
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.admin-editor-tab-button {
+    height: 100%;
+    font-size: 18px;
+    font-weight: 500;
+    background: transparent;
+    border: none;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    font-family: "Geist";
+    margin-right: 24px;
+    opacity: 0.4;
+    cursor: pointer;
+    box-sizing: border-box;
+    position: relative;
+    box-shadow: inset 0 -3px 0 0 transparent;
+}
+
+.admin-editor-tab-button:hover {
+    opacity: 1;
+}
+
+.admin-editor-tab-button.active {
+    box-shadow: inset 0 -3px 0 0 var(--accent);
+    opacity: 1;
 }

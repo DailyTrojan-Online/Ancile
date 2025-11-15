@@ -43,7 +43,7 @@
 				selectedRows[i] = value;
 			}
 		}
-		selectedRows[index] = !value;
+		// selectedRows[index] = !value;
 		recentlyClickedIndex = index;
 	}
 	$effect(() => {

@@ -1,4 +1,4 @@
-import { redirect } from '@sveltejs/kit'
+import { error, fail, redirect } from '@sveltejs/kit'
 
 import type { Actions } from './$types'
 
@@ -8,10 +8,10 @@ export const actions: Actions = {
     const email = formData.get('email') as string
     const password = formData.get('password') as string
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
-    if (error) {
-      console.error(error)
-      redirect(303, '/auth/error')
+    const { error: err } = await supabase.auth.signInWithPassword({ email, password })
+    if (err) {
+      console.error(err)
+      return fail(err?.status ?? 404, {error: err?.message});
     } else {
       redirect(303, '/admin')
     }
@@ -20,10 +20,10 @@ export const actions: Actions = {
     const formData = await request.formData()
     const email = formData.get('email') as string
 
-    const { error } = await supabase.auth.resetPasswordForEmail(email)
-    if (error) {
-      console.error(error)
-      redirect(303, '/auth/error')
+    const { error: err } = await supabase.auth.resetPasswordForEmail(email)
+    if (err) {
+      console.error(err)
+      return fail(err?.status ?? 404, {error: err?.message});
     }
   }
 }

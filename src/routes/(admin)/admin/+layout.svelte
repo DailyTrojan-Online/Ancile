@@ -2,8 +2,12 @@
     import AdminSidebar from "$lib/components/AdminSidebar.svelte";
     let { children, data } = $props();
     import  {page} from "$app/state"
+	import AdminModal from "$lib/components/AdminModal.svelte";
+	import { setContext } from "svelte";
     let { supabase, permissions, role} = $derived(data);
     let closed = $derived(page.url.toString().includes("edit/"));
+
+    setContext("supabase", supabase);
 </script>
 
 <div class="admin-root">
@@ -13,6 +17,8 @@
     {@render children()}
 </main>
 </div>
+
+<AdminModal></AdminModal>
 <style>
     .admin-root {
         display: flex;

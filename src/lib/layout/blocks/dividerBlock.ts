@@ -1,6 +1,6 @@
 import { Block, Lithograph, type BlockSaveData } from "../lithograph";
 
-type DividerBlockSaveData = {}
+export type DividerBlockSaveData = {}
 
 export class DividerBlock extends Block {
 	constructor(editor: Lithograph, parent: Block | null) {
@@ -33,6 +33,8 @@ export class DividerBlock extends Block {
 			type: "divider",
 			id: this.id,
 			data: {},
+            html_id: this.htmlId,
+            classes: this.classes
 		}
 	}
 }

@@ -1,6 +1,6 @@
 import { Block, Lithograph, type BlockSaveData } from "../lithograph";
 
-type ContainerBlockSaveData = {
+export type ContainerBlockSaveData = {
     size: {numerator: number, denominator: number},
     children: BlockSaveData<any>[]
 }
@@ -122,6 +122,8 @@ export class ContainerBlock extends Block {
                 size: this.size,
                 children: this.childBlocks.map((child) => child.save()),
             },
+            html_id: this.htmlId,
+            classes: this.classes
         }
     }
 }
