@@ -31,6 +31,7 @@
 		datas.push({
 		label: dataset.label,
 		data: dataset.data,
+		pointStyle: false,
 		})
 		console.log(dataset.data.length, data.times.length)
 	})
