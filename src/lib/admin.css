@@ -218,6 +218,13 @@ a {
     position: relative;
 }
 
+.admin-grid-image {
+    width: 70px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
 .admin-grid-button * {}
 
 .admin-grid-button i {
@@ -924,7 +931,7 @@ button,
 }
 
 .ti-loader-2,
-.spin {
+.spin, .spin::before {
     animation: rotate 1s cubic-bezier(.19, .74, .83, .55) infinite;
 }
 

@@ -99,7 +99,7 @@
 							month: "long",
 							day: "numeric",
 						})}
-					{:else if field.key == "publish_date"}
+					{:else if field.key == "publish_date" || field.key == "date"}
 						{new Date(data[field.key]).toLocaleString("en-US", {
 							year: "numeric",
 							month: "long",

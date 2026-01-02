@@ -136,6 +136,16 @@
 		</div>
 	{/if}
 	<div class="button-wrapper">
+		<a
+			href="/admin/wpcache"
+			class="button-sidebar"
+			class:button-sidebar-active={page.url.pathname === "/admin/wpcache"}
+		>
+			<i class="ti ti-server-bolt"></i>
+			<p>WP Cache</p>
+		</a>
+	</div>
+	<div class="button-wrapper">
 		<button class="button-sidebar">
 			<i class="ti ti-settings"></i>
 			<p>Site Settings</p>
@@ -159,4 +169,11 @@
 </div>
 
 <style>
+    
+    .divider
+    {
+        width: 100%;
+        height: 1px;
+        background: var(--border);
+    }
 </style>
