@@ -28,6 +28,12 @@
         image: string;
         excerpt: string;
     };
+    type Taxonomy = {
+        wp_id: number;
+        name: string;
+        slug: string;
+        type: "category" | "tag";
+    };
     let displayFields = [
         {
             label: "Image",
@@ -47,19 +53,86 @@
         },
     ];
 
+    function parseWPJson(data: string) {
+        let i = data.lastIndexOf("}");
+        let repairedData = jsonrepair(data.substring(0, i + 1));
+        let wpData = JSON.parse(repairedData);
+        return wpData;
+    }
+
+    let tagsIngested = $state(0);
+    let categoriesIngested = $state(0);
+
+    async function ingestTags(amount = 100, page = 1) {
+        let response = await fetch(
+            `https://dailytrojan.com/wp-json/wp/v2/tags?per_page=${amount}&page=${page}`,
+        );
+        let data = await response.text();
+        let wpData = parseWPJson(data);
+        let tags: Taxonomy[] = [];
+        for (let i = 0; i < wpData.length; i++) {
+            let id = wpData[i].id;
+            let name = wpData[i].name;
+            let slug = wpData[i].slug;
+            let type = wpData[i].type;
+            tags.push({
+                wp_id: id,
+                name: cleanString(name),
+                slug: slug,
+                type: "tag",
+            });
+            tagsIngested++;
+        }
+        let { error } = await supabase.from("wp_taxonomies").upsert(tags, {
+            onConflict: "wp_id",
+            ignoreDuplicates: true,
+        });
+    }
+
+    async function ingestCategories(amount = 100, page = 1) {
+        let response = await fetch(
+            `https://dailytrojan.com/wp-json/wp/v2/categories?per_page=${amount}&page=${page}`,
+        );
+        let data = await response.text();
+        let wpData = parseWPJson(data);
+        let categories: Taxonomy[] = [];
+        for (let i = 0; i < wpData.length; i++) {
+            let id = wpData[i].id;
+            let name = wpData[i].name;
+            let slug = wpData[i].slug;
+            let type = wpData[i].type;
+            categories.push({
+                wp_id: id,
+                name: cleanString(name),
+                slug: slug,
+                type: "category",
+            });
+            categoriesIngested++;
+        }
+        let { error } = await supabase
+            .from("wp_taxonomies")
+            .upsert(categories, {
+                onConflict: "wp_id",
+                ignoreDuplicates: true,
+            });
+        console.log(data);
+    }
+
     async function ingestArticles(amount = 100, page = 1) {
         let response = await fetch(
             `https://dailytrojan.com/wp-json/wp/v2/posts?per_page=${amount}&page=${page}`,
         );
         let data = await response.text();
-        let i = data.lastIndexOf("}");
-        let repairedData = jsonrepair(data.substring(0, i + 1));
-        let wpData = JSON.parse(repairedData);
+        let wpData = parseWPJson(data);
         let articles: WPArticle[] = [];
         let content: {
             article_id: number;
             raw_content: string;
             clean_content: string;
+        }[] = [];
+        let taxonomyJoins: {
+            article_id: number;
+            taxonomy_id: number;
         }[] = [];
         for (let i = 0; i < wpData.length; i++) {
             let id = wpData[i].id;
@@ -67,7 +140,7 @@
             let url = wpData[i].link;
             let title = wpData[i].title.rendered;
             let date = wpData[i].date;
-            let author = wpData[i].yoast_head_json.author;
+            let author = wpData[i].author_field;
             let image = wpData[i].yoast_head_json.og_image[0].url;
             let excerpt = wpData[i].excerpt.rendered;
 
@@ -81,14 +154,12 @@
                 image: image,
                 excerpt: cleanString(excerpt),
             });
-            let clean ="";
-            
+            let clean = "";
+
             try {
                 clean = await cleanHtmlContent(wpData[i].content.rendered);
             } catch (error) {
-                console.error(
-                    `Error cleaning article ${id}: ${error}`,
-                );
+                console.error(`Error cleaning article ${id}: ${error}`);
             }
 
             content.push({
@@ -96,6 +167,23 @@
                 raw_content: wpData[i].content.rendered,
                 clean_content: clean,
             });
+            
+            console.log(wpData[i].categories)
+            wpData[i].categories.forEach((cat: any) => {
+                taxonomyJoins.push({
+                    article_id: id,
+                    taxonomy_id: cat,
+                });
+            });
+            wpData[i].tags.forEach((cat: any) => {
+                taxonomyJoins.push({
+                    article_id: id,
+                    taxonomy_id: cat,
+                });
+            });
+            
+            
+            ingestStatus++;
         }
         let { error } = await supabase.from("wp_articles").upsert(articles, {
             onConflict: "wp_id",
@@ -107,6 +195,11 @@
                 onConflict: "article_id",
                 ignoreDuplicates: true,
             });
+        let { error: taxonomyJoinError } = await supabase
+            .from("wp_article_taxonomy")
+            .upsert(taxonomyJoins);
+        console.log(taxonomyJoins)
+        console.log(error, contentError, taxonomyJoinError);
     }
 
     function cleanString(str: string) {
@@ -117,12 +210,6 @@
 
     onMount(async () => {
         refresh();
-
-        let offset = 10;
-
-        for (let i = offset; i <= offset + 10; i++) {
-            // ingestArticles(100, i);
-        }
     });
 
     async function ingestTotalCountOfArticles(count: number, page = 1) {
@@ -131,20 +218,48 @@
         ingestStatus = 0;
         if (count < 100) {
             await ingestArticles(count, page);
-            ingestStatus = count;
+            refresh();
         } else {
             for (let i = 0; i < count; i += 100) {
                 await ingestArticles(100, page++);
-                ingestStatus += 100;
+                refresh();
             }
         }
         ingesting = false;
         closeModalById(ingestModalId);
     }
 
+    async function ingestTotalCountOfTags(count: number, page = 1) {
+        tagsIngested = 0;
+        if (count < 100) {
+            await ingestTags(count, page);
+            refresh();
+        } else {
+            for (let i = 0; i < count; i += 100) {
+                await ingestTags(100, page++);
+                refresh();
+            }
+        }
+        closeModalById(ingestModalId);
+    }
+
+    async function ingestTotalCountOfCategories(count: number, page = 1) {
+        categoriesIngested = 0;
+        if (count < 100) {
+            await ingestCategories(count, page);
+            refresh();
+        } else {
+            for (let i = 0; i < count; i += 100) {
+                await ingestCategories(100, page++);
+                refresh();
+            }
+        }
+        closeModalById(ingestModalId);
+    }
+
     let ingestMax = $state(1);
     let ingestStatus = $state(0);
-    let ingestPage = $state(0);
+    let ingestPage = $state(1);
 
     let loadedCache: WPArticle[] | null = $state([]);
 
@@ -158,7 +273,7 @@
             .select("*", { count: "exact", head: true });
         totalCount = count ?? 0;
         if (page > pageCount) {
-            page = pageCount;
+            page = Math.max(pageCount, 1);
         }
         let query = supabase
             .from("wp_articles")
@@ -318,33 +433,52 @@
             if (!articleContents || error) {
                 continue;
             }
-            articleContents.forEach(async (article) => {
-                let raw = article.raw_content;
-                let cleaned = "";
-                try {
-                    cleaned = await cleanHtmlContent(raw);
-                } catch (error) {
-                    console.error(
-                        `Error cleaning article ${article.id}: ${error}`,
-                    );
-                }
-                let { data, error: err } = await supabase
-                    .from("wp_article_content")
-                    .update({ clean_content: cleaned })
-                    .eq("id", article.id);
-                totalCleaned++;
-            });
+            articleContents.forEach(
+                async (article: {
+                    id: string;
+                    raw_content: string;
+                    clean_content: string;
+                }) => {
+                    let raw = article.raw_content;
+                    let cleaned = "";
+                    try {
+                        cleaned = await cleanHtmlContent(raw);
+                    } catch (error) {
+                        console.error(
+                            `Error cleaning article ${article.id}: ${error}`,
+                        );
+                    }
+                    let { data, error: err } = await supabase
+                        .from("wp_article_content")
+                        .update({ clean_content: cleaned })
+                        .eq("id", article.id);
+                    totalCleaned++;
+                },
+            );
         }
     }
 
     function openIngestModal() {
-        ingestModalId = openModal(ingestModal, "snippet", "center");
+        ingestStatus = 0;
+        tagsIngested = 0;
+        categoriesIngested = 0;
+        ingestModalId = openModal(ingestModal, "snippet", "right");
     }
     let ingestValue = $state(0);
     let ingesting = $state(false);
     let ingestModalId = $state("");
-    function ingestFromModal() {
-        ingestTotalCountOfArticles(ingestValue, ingestPage);
+    function ingestFromModal(mode: "articles" | "tags" | "categories") {
+        switch (mode) {
+            case "articles":
+                ingestTotalCountOfArticles(ingestValue, ingestPage);
+                break;
+            case "tags":
+                ingestTotalCountOfTags(ingestValue, ingestPage);
+                break;
+            case "categories":
+                ingestTotalCountOfCategories(ingestValue, ingestPage);
+                break;
+        }
     }
 </script>
 
@@ -402,14 +536,14 @@
     </div>
 {/snippet}
 {#snippet ingestModal()}
-    <div class="admin-modal-content invite-modal">
-        <div class="admin-editor-column admin-editor-column-noborder">
-            <h2>
-                Ingest Articles
-            </h2>
+    <div class="admin-modal-content right-modal">
+        <div
+            class="admin-editor-column admin-editor-column-noborder admin-editor-sidebar-inner"
+        >
+            <h2>Ingest Articles</h2>
 
             <div class="admin-editor-input-group">
-                <div class="admin-editor-input-label">Articles to Ingest</div>
+                <div class="admin-editor-input-label">Elements to Ingest</div>
                 <input
                     type="number"
                     class="admin-editor-input"
@@ -430,10 +564,22 @@
                 style:--progress={`${(ingestStatus / ingestMax) * 100}%`}
             ></div>
             {Math.min(ingestStatus, ingestMax)} articles ingested
+            <br />
+            {tagsIngested} tags ingested
+            <br />
+            {categoriesIngested} categories ingested
             <div class="flex-hor flex-right">
                 <button
                     class="admin-button button-primary"
-                    onclick={ingestFromModal}>Ingest</button
+                    onclick={()=>ingestFromModal("articles")}>Ingest Articles</button
+                >
+                <button
+                    class="admin-button button-primary"
+                    onclick={()=>ingestFromModal("categories")}>Ingest Categories</button
+                >
+                <button
+                    class="admin-button button-primary"
+                    onclick={()=>ingestFromModal("tags")}>Ingest Tags</button
                 >
             </div>
         </div>
