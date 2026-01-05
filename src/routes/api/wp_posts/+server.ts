@@ -2,14 +2,10 @@ import { json } from "@sveltejs/kit";
 
 export async function GET({ locals: { supabase }, url, request }) {
   let params = url.searchParams;
-  console.log(params);
 
-  params.forEach((value, key) => {
-    console.log(value, key);
-  });
   let page = Math.max(1, parseInt(params.get("page") ?? "1"));
   let per_page = Math.max(1, parseInt(params.get("per_page") ?? "10"));
-  console.log(page, per_page, per_page * (page - 1), per_page * page - 1);
+  let showContent = params.get("content") ?? "true";
 
   function parseList(param: string) {
     return param
@@ -29,18 +25,35 @@ export async function GET({ locals: { supabase }, url, request }) {
     parseList(categories_include),
   );
 
-  const { data, error } = await supabase.rpc("get_wp_articles", {
-    page,
-    per_page,
-    excluded_taxonomies,
-    included_taxonomies,
-  });
-  console.log(data, error);
-  if(error ) {
-    return json({error: error.message}, {status: 500});
+  // const { data, error } = await supabase.rpc("get_wp_articles", {
+  //   page,
+  //   per_page,
+  //   excluded_taxonomies,
+  //   included_taxonomies,
+  // });
+  let query = supabase
+    .from("wp_articles")
+    .select(
+      "id:wp_id, slug, url, title, date, author, image, excerpt, taxonomy" +
+        (showContent == "true" ? ", content" : ""),
+    );
+  if (included_taxonomies.length > 0) {
+    query = query.contains("taxonomy", included_taxonomies);
   }
-  else if(data.length === 0) {
-    return json({error: "No posts found"}, {status: 404});
+  if (excluded_taxonomies.length > 0) {
+    let string = "{" + excluded_taxonomies.map((x) => `"${x}"`).join(",") + "}";
+    query = query.not("taxonomy", "cs", string);
+  }
+  query = query
+    .range(per_page * (page - 1), per_page * page - 1)
+    .order("date", {
+      ascending: false,
+    });
+  const { data, error } = await query;
+  if (error) {
+    return json({ error: error.message }, { status: 500 });
+  } else if (data.length === 0) {
+    return json({ error: "No posts found" }, { status: 404 });
   }
 
   return json(data);

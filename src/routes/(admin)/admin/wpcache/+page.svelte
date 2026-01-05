@@ -27,6 +27,8 @@
         author: string;
         image: string;
         excerpt: string;
+        taxonomy: number[];
+        content: string;
     };
     type Taxonomy = {
         wp_id: number;
@@ -118,7 +120,11 @@
         console.log(data);
     }
 
-    async function ingestArticles(amount = 100, page = 1) {
+    async function ingestArticles(
+        amount = 100,
+        page = 1,
+        ingestNewTaxonomy = false,
+    ) {
         let response = await fetch(
             `https://dailytrojan.com/wp-json/wp/v2/posts?per_page=${amount}&page=${page}`,
         );
@@ -144,6 +150,15 @@
             let image = wpData[i].yoast_head_json.og_image[0].url;
             let excerpt = wpData[i].excerpt.rendered;
 
+            let taxonomy = wpData[i].categories.concat(wpData[i].tags);
+
+            let clean = "";
+
+            try {
+                clean = await cleanHtmlContent(wpData[i].content.rendered);
+            } catch (error) {
+                console.error(`Error cleaning article ${id}: ${error}`);
+            }
             articles.push({
                 wp_id: id,
                 slug: slug,
@@ -153,22 +168,17 @@
                 author: author,
                 image: image,
                 excerpt: cleanString(excerpt),
+                taxonomy,
+                content: clean,
             });
-            let clean = "";
-
-            try {
-                clean = await cleanHtmlContent(wpData[i].content.rendered);
-            } catch (error) {
-                console.error(`Error cleaning article ${id}: ${error}`);
-            }
 
             content.push({
                 article_id: id,
                 raw_content: wpData[i].content.rendered,
                 clean_content: clean,
             });
-            
-            console.log(wpData[i].categories)
+
+            console.log(wpData[i].categories);
             wpData[i].categories.forEach((cat: any) => {
                 taxonomyJoins.push({
                     article_id: id,
@@ -181,56 +191,61 @@
                     taxonomy_id: cat,
                 });
             });
-            console.log(wpData[i])
-            
-            let taxResponse = await fetch("https://dailytrojan.com/wp-json/wp/v2/tags?post=" + id);
-            let taxData = await taxResponse.json();
-            let catResponse = await fetch("https://dailytrojan.com/wp-json/wp/v2/categories?post=" + id);
-            let catData = await catResponse.json();
-            
-            let categories: Taxonomy[] = [];
-            let tags: Taxonomy[] = [];
-            for (let i = 0; i < catData.length; i++) {
-                let id = catData[i].id;
-                let name = catData[i].name;
-                let slug = catData[i].slug;
-                let type = "category";
-                categories.push({
-                    wp_id: id,
-                    name: cleanString(name),
-                    slug: slug,
-                    type: "category",
-                });
-                categoriesIngested++;
+            console.log(wpData[i]);
+            if (ingestNewTaxonomy) {
+                let taxResponse = await fetch(
+                    "https://dailytrojan.com/wp-json/wp/v2/tags?post=" + id,
+                );
+                let taxData = await taxResponse.json();
+                let catResponse = await fetch(
+                    "https://dailytrojan.com/wp-json/wp/v2/categories?post=" +
+                        id,
+                );
+                let catData = await catResponse.json();
+
+                let categories: Taxonomy[] = [];
+                let tags: Taxonomy[] = [];
+                for (let i = 0; i < catData.length; i++) {
+                    let id = catData[i].id;
+                    let name = catData[i].name;
+                    let slug = catData[i].slug;
+                    let type = "category";
+                    categories.push({
+                        wp_id: id,
+                        name: cleanString(name),
+                        slug: slug,
+                        type: "category",
+                    });
+                    categoriesIngested++;
+                }
+                for (let i = 0; i < taxData.length; i++) {
+                    let id = taxData[i].id;
+                    let name = taxData[i].name;
+                    let slug = taxData[i].slug;
+                    let type = "tag";
+                    tags.push({
+                        wp_id: id,
+                        name: cleanString(name),
+                        slug: slug,
+                        type: "tag",
+                    });
+                    tagsIngested++;
+                }
+                let { error: tagError } = await supabase
+                    .from("wp_taxonomies")
+                    .upsert(tags, {
+                        onConflict: "wp_id",
+                        ignoreDuplicates: true,
+                    });
+                let { error: catError } = await supabase
+                    .from("wp_taxonomies")
+                    .upsert(categories, {
+                        onConflict: "wp_id",
+                        ignoreDuplicates: true,
+                    });
+                console.log(tagError, catError);
             }
-            for (let i = 0; i < taxData.length; i++) {
-                let id = taxData[i].id;
-                let name = taxData[i].name;
-                let slug = taxData[i].slug;
-                let type = "tag";
-                tags.push({
-                    wp_id: id,
-                    name: cleanString(name),
-                    slug: slug,
-                    type: "tag",
-                });
-                tagsIngested++;
-            }
-            let { error: tagError } = await supabase
-                .from("wp_taxonomies")
-                .upsert(tags, {
-                    onConflict: "wp_id",
-                    ignoreDuplicates: true,
-                });
-            let { error: catError } = await supabase
-                .from("wp_taxonomies")
-                .upsert(categories, {
-                    onConflict: "wp_id",
-                    ignoreDuplicates: true,
-                });
-            console.log(tagError, catError);
-            
-            
+
             ingestStatus++;
         }
         console.log(articles);
@@ -247,7 +262,7 @@
         let { error: taxonomyJoinError } = await supabase
             .from("wp_article_taxonomy")
             .upsert(taxonomyJoins);
-        console.log(taxonomyJoins)
+        console.log(taxonomyJoins);
         console.log(error, contentError, taxonomyJoinError);
     }
 
@@ -620,15 +635,17 @@
             <div class="flex-hor flex-right">
                 <button
                     class="admin-button button-primary"
-                    onclick={()=>ingestFromModal("articles")}>Ingest Articles</button
+                    onclick={() => ingestFromModal("articles")}
+                    >Ingest Articles</button
                 >
                 <button
                     class="admin-button button-primary"
-                    onclick={()=>ingestFromModal("categories")}>Ingest Categories</button
+                    onclick={() => ingestFromModal("categories")}
+                    >Ingest Categories</button
                 >
                 <button
                     class="admin-button button-primary"
-                    onclick={()=>ingestFromModal("tags")}>Ingest Tags</button
+                    onclick={() => ingestFromModal("tags")}>Ingest Tags</button
                 >
             </div>
         </div>
