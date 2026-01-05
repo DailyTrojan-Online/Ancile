@@ -74,7 +74,7 @@ export async function GET({ locals: { supabase }, url, request }) {
   if (error) {
     return json({ error: error.message }, { status: 500 });
   } else if (data.length === 0) {
-    return json({ error: "No posts found" }, { status: 404 });
+    return json([]);
   }
 
   return json(data);
