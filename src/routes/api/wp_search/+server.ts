@@ -31,6 +31,11 @@ export async function GET({ locals: { supabase }, url, request }) {
     parseList(categories_include),
   );
 
+  let include_id = params.get("include") ?? "";
+  let id_include = parseList(include_id);
+
+  let slug = params.get("slug") ?? "";
+
   console.log(term);
 
   let query = supabase
@@ -42,6 +47,13 @@ export async function GET({ locals: { supabase }, url, request }) {
     .textSearch("fts", term, {
       type: "websearch",
     });
+
+  if (id_include.length > 0) {
+    query = query.in("wp_id", id_include);
+  }
+  if (slug.length > 0) {
+    query = query.eq("slug", slug);
+  }
 
   if (included_taxonomies.length > 0) {
     query = query.contains("taxonomy", included_taxonomies);
