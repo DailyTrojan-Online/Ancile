@@ -49,7 +49,7 @@ export async function GET({ locals: { supabase }, url, request }) {
   if (excluded_taxonomies.length > 0) {
     let string = "{" + excluded_taxonomies.join(",") + "}";
     console.log(string);
-    query = query.not("taxonomy", "cs", string);
+    query = query.not("taxonomy", "ov", string);
   }
 
   if (id_include.length > 0) {
