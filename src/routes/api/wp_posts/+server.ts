@@ -21,15 +21,15 @@ export async function GET({ locals: { supabase }, url, request }) {
   let excluded_taxonomies = parseList(tags_exclude).concat(
     parseList(categories_exclude),
   );
+  console.log(excluded_taxonomies);
   let included_taxonomies = parseList(tags_include).concat(
     parseList(categories_include),
   );
-  
+
   let include_id = params.get("include") ?? "";
   let id_include = parseList(include_id);
 
   let slug = params.get("slug") ?? "";
-
 
   // const { data, error } = await supabase.rpc("get_wp_articles", {
   //   page,
@@ -47,19 +47,18 @@ export async function GET({ locals: { supabase }, url, request }) {
     query = query.contains("taxonomy", included_taxonomies);
   }
   if (excluded_taxonomies.length > 0) {
-    let string = "{" + excluded_taxonomies.map((x) => `"${x}"`).join(",") + "}";
+    let string = "{" + excluded_taxonomies.join(",") + "}";
+    console.log(string);
     query = query.not("taxonomy", "cs", string);
   }
-  
-  
+
   if (id_include.length > 0) {
     query = query.in("wp_id", id_include);
   }
   if (slug.length > 0) {
     query = query.eq("slug", slug);
   }
-  
-  
+
   query = query
     .range(per_page * (page - 1), per_page * page - 1)
     .order("date", {
