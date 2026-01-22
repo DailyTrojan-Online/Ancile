@@ -146,6 +146,16 @@
 		</a>
 	</div>
 	<div class="button-wrapper">
+		<a
+			href="/admin/app"
+			class="button-sidebar"
+			class:button-sidebar-active={page.url.pathname === "/admin/app"}
+		>
+			<i class="ti ti-devices"></i>
+			<p>App Settings</p>
+		</a>
+	</div>
+	<div class="button-wrapper">
 		<button class="button-sidebar">
 			<i class="ti ti-settings"></i>
 			<p>Site Settings</p>

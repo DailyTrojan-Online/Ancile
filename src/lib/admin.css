@@ -261,6 +261,13 @@ a {
     color: black;
 }
 
+.h2-with-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px !important;
+    box-sizing: border-box;
+}
 .button-secondary:hover {
     background: #ffd736;
 }
@@ -275,8 +282,9 @@ a {
 }
 
 .button-delete {
-    background: #e9eaec;
+    background: transparent;
     color: #cd0000;
+    border: 2px solid #cd0000;
 }
 
 .flex-hor {
@@ -375,7 +383,7 @@ a {
 }
 
 .admin-modal-action-button {
-    position: fixed !important;
+    position: absolute !important;
     top: 9px;
     right: 20px;
     z-index: 20;
@@ -934,6 +942,10 @@ button,
 .spin, .spin::before {
     animation: rotate 1s cubic-bezier(.19, .74, .83, .55) infinite;
 }
+.spin-center {
+    animation: rotate-center 1s cubic-bezier(.19, .74, .83, .55) infinite;
+    
+}
 
 .admin-chip-list {
     display: flex;
@@ -964,6 +976,15 @@ button,
 
     100% {
         transform: rotate(360deg);
+    }
+}
+@keyframes rotate-center {
+    0% {
+        transform:  translate(-50%, -50%) rotate(0deg);
+    }
+
+    100% {
+        transform:  translate(-50%, -50%) rotate(360deg);
     }
 }
 
@@ -1157,6 +1178,7 @@ button,
     gap: 20px;
     border-left: 1px solid var(--border);
     min-width: 340px;
+    position: relative
 }
 
 .admin-editor-metadata-sidebar h2 {
