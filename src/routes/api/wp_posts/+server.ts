@@ -6,6 +6,7 @@ export async function GET({ locals: { supabase }, url, request }) {
   let page = Math.max(1, parseInt(params.get("page") ?? "1"));
   let per_page = Math.max(1, parseInt(params.get("per_page") ?? "10"));
   let showContent = params.get("content") ?? "true";
+  let excludeColumns = params.get("exclude_columns") ?? "false";
 
   function parseList(param: string) {
     return param
@@ -25,6 +26,16 @@ export async function GET({ locals: { supabase }, url, request }) {
   let included_taxonomies = parseList(tags_include).concat(
     parseList(categories_include),
   );
+
+  if (excludeColumns == "true") {
+    let { data: columnData } = await supabase
+      .from("app_columns")
+      .select("tag_id");
+    if (columnData) {
+      let columnIds = columnData.map((column) => column.tag_id);
+      excluded_taxonomies = excluded_taxonomies.concat(columnIds);
+    }
+  }
 
   let include_id = params.get("include") ?? "";
   let id_include = parseList(include_id);
@@ -47,8 +58,8 @@ export async function GET({ locals: { supabase }, url, request }) {
     query = query.contains("taxonomy", included_taxonomies);
   }
   if (excluded_taxonomies.length > 0) {
+    
     let string = "{" + excluded_taxonomies.join(",") + "}";
-    console.log(string);
     query = query.not("taxonomy", "ov", string);
   }
 
