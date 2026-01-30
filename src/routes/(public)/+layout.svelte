@@ -31,7 +31,8 @@
 		{#if session}
 			<div class={"admin-header-bar admin-header-bar-" + pageData?.status}>
 				<div class="admin-header-bar-area admin-header-bar-area-left">
-					<a href={"admin/edit/" + pageData?.id}>Edit Page</a>
+				<a href={"admin/"}>Dashboard</a>
+				<a href={"admin/edit/" + pageData?.id}>Edit Page</a>
 				</div>
 				<div class="admin-header-bar-area admin-header-bar-area-center">
 					{#if pageData?.status == "draft"}
