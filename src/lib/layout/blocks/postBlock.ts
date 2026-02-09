@@ -1,6 +1,11 @@
+import type { Component } from "svelte";
 import { Block, Lithograph, type BlockSaveData } from "../lithograph";
+import PostSettings from "$lib/components/LithographSettings/PostSettings.svelte";
 
-type PostBlockSaveData = {
+
+export type PostBlockImagePosition = "none" | "left" | "right" | "top" | "bottom"
+
+export type PostBlockSaveData = {
     limit: number;
     offset: number;
     tags: string[];
@@ -8,10 +13,19 @@ type PostBlockSaveData = {
     sortBy: 'date' | 'popularity'
     sortOrder: 'asc' | 'desc';
     includeSticky: boolean;
-
+    imagePosition: PostBlockImagePosition;
+    showHeadline: boolean;
+    showSubheadline: boolean;
+    showByline: boolean;
+    showPublishDate: boolean;
 }
 
 export class PostBlock extends Block {
+    imagePosition: PostBlockImagePosition = "none";
+    showHeadline: boolean = true;
+    showSubheadline: boolean = true;
+    showByline: boolean = true;
+    showPublishDate: boolean = true;
     constructor(editor: Lithograph, parent: Block | null) {
         super(editor, parent);
         this.title = "Posts";
@@ -24,8 +38,13 @@ export class PostBlock extends Block {
     static get blockName() {
         return "post"
     }
-    setData(data: any): void {
-        
+    setData(data: PostBlockSaveData): void {
+        console.log(data)
+        this.imagePosition = data.imagePosition;
+        this.showHeadline = data.showHeadline;
+        this.showSubheadline = data.showSubheadline;
+        this.showByline = data.showByline;
+        this.showPublishDate = data.showPublishDate;
     }
 
     createBlock() {
@@ -50,7 +69,18 @@ export class PostBlock extends Block {
                 sortBy: 'date',
                 sortOrder: 'desc',
                 includeSticky: false,
+                imagePosition: this.imagePosition,
+                showHeadline: this.showHeadline,
+                showSubheadline: this.showSubheadline,
+                showByline: this.showByline,
+                showPublishDate: this.showPublishDate
             },
+            html_id: this.htmlId,
+            classes: this.classes
         }
+    }
+
+    getSettingsModal() {
+        return PostSettings;
     }
 }

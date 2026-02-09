@@ -4,12 +4,6 @@ import { error } from '@sveltejs/kit';
 import type { EntryGenerator, PageServerLoad } from './$types';
 import moment from 'moment';
 
-export const config = {
-	isr: {
-	  expiration: 60,
-	  bypassToken: process.env.BYPASS_TOKEN,
-	},
-  };
 
 export const entries: EntryGenerator = async () => {
 	const res = await fetch('https://project-traveler.vercel.app/api/get-all-slugs');
@@ -41,6 +35,10 @@ export const load: PageServerLoad = async ({ locals: { supabase, session }, para
 				findPostBlocks(content.data.children);
 			}
 		}
+	}
+	if(!page.content || !page.content.content) {
+		error(500, 'Internal server error');
+
 	}
 	findPostBlocks(page.content.content);
 	let postBlockQueryResults: {id: string, posts: any[]}[] = foundPostBlocks.map((block) => {return {id: block.id, posts: []}});

@@ -4,8 +4,19 @@
 	import { onMount, type Snippet } from "svelte";
 	import { copy } from "svelte-copy";
 	import RefreshButton from "$lib/components/RefreshButton.svelte";
+	import { closeTopModal } from "$lib/modalManager.svelte";
 
-	let { supabase, selectedItem = $bindable(null), actionBarContent  }: { supabase: SupabaseClient, selectedItem?: any, actionBarContent?: Snippet } = $props();
+	let {
+		supabase,
+		selectedItem = $bindable(null),
+		actionBarContent,
+		showCloseButton = false,
+	}: {
+		supabase: SupabaseClient;
+		selectedItem?: any;
+		actionBarContent?: Snippet;
+		showCloseButton?: boolean;
+	} = $props();
 
 	let media: any[] = $state([]);
 	let page = 0;
@@ -25,7 +36,7 @@
 			.from("files_metadata")
 			.select("*")
 			.order("created_at", { ascending: false })
-			.range(page * 50, ((page + 1) * 50) - 1);
+			.range(page * 50, (page + 1) * 50 - 1);
 		if (searchQuery != "") {
 			query.ilike("name", `%${searchQuery}%`);
 		}
@@ -115,7 +126,7 @@
 	}
 </script>
 
-<div class="admin-page-content">
+<div class="admin-page-content admin-media-library-wrapper">
 	<div class="admin-page-header">
 		<div class="admin-buttons">
 			<h1>Media Library</h1>
@@ -147,13 +158,22 @@
 				</div>
 			{/if}
 		</div>
+		{#if showCloseButton}
+			<button
+				class="admin-header-tame-button admin-modal-close-button"
+				aria-label="Close modal"
+				onclick={closeTopModal}
+			>
+				<i class="ti ti-x"></i>
+			</button>
+		{/if}
 	</div>
 
 	<div class="admin-editor">
 		<div class="admin-editor-fullwidth">
 			<div class="admin-media-gallery">
-				{#if media.length == 0 }
-				<p>No media found</p>
+				{#if media.length == 0}
+					<p>No media found</p>
 				{/if}
 				{#each media as item}
 					<div
@@ -179,18 +199,18 @@
 				>Load More Images</button
 			>
 		</div>
-		{#if selectedItem}
-			<div class="admin-editor-column">
-				<h2>Image</h2>
+		<div class="admin-editor-column" style:max-width="340px">
+			<h2>Image</h2>
+			{#if selectedItem}
 				<img src={selectedItem.url} alt={selectedItemName} />
-				<div class="admin-editor-metadata-group">
-					<div class="admin-editor-metadata-label">URL</div>
+				<div class="admin-editor-input-group">
+					<div class="admin-editor-input-label">URL</div>
 					<div class="admin-editor-metadata-id" use:copy={selectedItem.url}>
 						{selectedItem.url}
 					</div>
 				</div>
-				<div class="admin-editor-metadata-group">
-					<div class="admin-editor-metadata-label">Name</div>
+				<div class="admin-editor-input-group">
+					<div class="admin-editor-input-label">Name</div>
 					<input
 						class="admin-editor-input"
 						type="text"
@@ -203,26 +223,29 @@
 						>Update</button
 					>
 				{/if}
-			</div>
-		{/if}
+			{/if}
+		</div>
 	</div>
 	{#if actionBarContent}
-	<div class="admin-page-footer">
-		{@render actionBarContent()}
-	</div>
+		<div class="admin-page-footer">
+			{@render actionBarContent()}
+		</div>
 	{/if}
 </div>
 
 <style>
+	.admin-media-library-wrapper {
+		width: 100%;
+		height: 100%;
+	}
 	.admin-editor-fullwidth {
 		padding-bottom: 100px;
 	}
 	.admin-media-gallery {
 		width: 100%;
 		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-		grid-auto-rows: 180px;
-		gap: 1rem;
+		grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+		gap: 8px;
 		padding: 1rem;
 		box-sizing: border-box;
 	}
@@ -231,11 +254,13 @@
 		position: relative;
 		cursor: pointer;
 		border: 1px solid #00000013;
+		box-sizing: border-box;
 	}
 	img {
 		border-radius: 4px;
 	}
 	.admin-media-item img {
+		aspect-ratio: 1 / 1;
 		width: 100%;
 		height: 100%;
 		object-fit: cover;

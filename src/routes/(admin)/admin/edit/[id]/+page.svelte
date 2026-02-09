@@ -349,12 +349,14 @@
 				{supabase}
 			/>
 			{#if previewing}
+			<main class="page-root">
 			{@html "<style>" + pageCSS + "</style>"}
 				<PageRenderer
 					content={pageRendererData}
 					injectCSS={false}
 					settings={pageSettings}
 				></PageRenderer>
+			</main>
 			{/if}
 		</div>
 
@@ -365,18 +367,18 @@
 			<div class="admin-editor-metadata-sidebar-inner admin-editor-sidebar-inner">
 				<div class="admin-editor-sidebar-section">
 					<h2>Info</h2>
-					<div class="admin-editor-metadata-group">
-						<div class="admin-editor-metadata-label">ID</div>
+					<div class="admin-editor-input-group">
+						<div class="admin-editor-input-label">ID</div>
 						<div class="admin-editor-metadata-id" use:copy={page.id}>
 							{page.id}
 						</div>
 					</div>
-					<div class="admin-editor-metadata-group">
-						<div class="admin-editor-metadata-label">Status</div>
+					<div class="admin-editor-input-group">
+						<div class="admin-editor-input-label">Status</div>
 						<div class={"admin-grid-status-" + page.status}>{page.status}</div>
 					</div>
-					<div class="admin-editor-metadata-group">
-						<div class="admin-editor-metadata-label">Schedule</div>
+					<div class="admin-editor-input-group">
+						<div class="admin-editor-input-label">Schedule</div>
 						<div
 							role="presentation"
 							class={"admin-editor-metadata-date"}
@@ -401,10 +403,10 @@
 				<div class="admin-editor-sidebar-section">
 					<h2>Metadata</h2>
 					<div
-						class="admin-editor-metadata-group"
-						class:admin-editor-metadata-group-error={titleError}
+						class="admin-editor-input-group"
+						class:admin-editor-input-group-error={titleError}
 					>
-						<div class="admin-editor-metadata-label">Title</div>
+						<div class="admin-editor-input-label">Title</div>
 						<input
 							type="text"
 							bind:value={page.title}
@@ -417,10 +419,10 @@
 						</div>
 					{/if}
 					<div
-						class="admin-editor-metadata-group"
-						class:admin-editor-metadata-group-error={slugError}
+						class="admin-editor-input-group"
+						class:admin-editor-input-group-error={slugError}
 					>
-						<div class="admin-editor-metadata-label">Slug</div>
+						<div class="admin-editor-input-label">Slug</div>
 						<div class="admin-editor-metadata-slug">
 							/{pageSlugWithoutSelfSlug}
 							<input
@@ -439,16 +441,16 @@
 							ERR: {slugErrorMessage}
 						</div>
 					{/if}
-					<div class="admin-editor-metadata-group">
-						<div class="admin-editor-metadata-label">Excerpt</div>
+					<div class="admin-editor-input-group">
+						<div class="admin-editor-input-label">Excerpt</div>
 						<textarea
 							class="admin-editor-metadata-textarea"
 							bind:value={page.excerpt}
 						></textarea>
 					</div>
 					{#if page.post_type == "page"}
-						<div class="admin-editor-metadata-group">
-							<div class="admin-editor-metadata-label">Parent Page</div>
+						<div class="admin-editor-input-group">
+							<div class="admin-editor-input-label">Parent Page</div>
 							{#if parentPage}
 								<input
 									type="text"
@@ -466,17 +468,17 @@
 							{/if}
 						</div>
 					{:else}
-						<div class="admin-editor-metadata-group">
-							<div class="admin-editor-metadata-label">Categories</div>
+						<div class="admin-editor-input-group">
+							<div class="admin-editor-input-label">Categories</div>
 							
 							<AdminTaxonomyInput {supabase} bind:taxonomies={pageCategories} table="categories"></AdminTaxonomyInput>
 						</div>
-						<div class="admin-editor-metadata-group">
-							<div class="admin-editor-metadata-label">Tags</div>
+						<div class="admin-editor-input-group">
+							<div class="admin-editor-input-label">Tags</div>
 							<AdminTaxonomyInput {supabase} bind:taxonomies={pageTags} table="tags"></AdminTaxonomyInput>
 						</div>
 					{/if}
-					<div class="admin-editor-metadata-group">
+					<div class="admin-editor-input-group">
 						<MediaLibraryInput bind:image={page.featured_image} {supabase} title="Featured Image" />
 					</div>
 				</div>

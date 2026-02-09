@@ -1,4 +1,5 @@
 <script lang="ts">
-    let {blockData} = $props();
+	let { blockData } = $props();
 </script>
-<div class="divider"></div>
+
+<div class={"ancile-divider " + blockData.classes} id={blockData.html_id}></div>

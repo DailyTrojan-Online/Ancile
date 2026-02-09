@@ -5,7 +5,6 @@
     --cardinal: #990000;
     --gold: #FFCC00;
 }
-
 body,
 html {
     padding: 0;
@@ -71,4 +70,16 @@ main.page-root {
 .ancile-page-root a {
     text-decoration: underline;
     color: var(--cardinal);
+}
+
+
+.ancile-text {
+    width: 100%;
+
+}
+.ancile-divider {
+    height: 1px;
+    width: 100%;
+    margin: 10px auto;
+    background: var(--border);
 }

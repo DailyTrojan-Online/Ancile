@@ -6,12 +6,9 @@
 	let data = $derived(page.data);
 	let session = $derived(data.session);
 	let pageData = $derived(data.page);
-	let { children, data: layoutData } = $props();
+	let { children } = $props();
 	let pageSettings = $derived(pageData?.page_settings);
 	async function trackPageView() {
-		if (layoutData.deploymentEnvironment != "production") {
-			return;
-		}
 		const url = window.location.pathname;
 		const userAgent = navigator.userAgent;
 
@@ -20,7 +17,7 @@
 			.then(({ ip }) => {
 				navigator.sendBeacon(
 					"/api/track",
-					JSON.stringify({ url, userAgent, ip, commitSHA: layoutData.deploymentGitSHA })
+					JSON.stringify({ url, userAgent, ip })
 				);
 			});
 	}
@@ -34,7 +31,8 @@
 		{#if session}
 			<div class={"admin-header-bar admin-header-bar-" + pageData?.status}>
 				<div class="admin-header-bar-area admin-header-bar-area-left">
-					<a href={"admin/edit/" + pageData?.id}>Edit Page</a>
+				<a href={"admin/"}>Dashboard</a>
+				<a href={"admin/edit/" + pageData?.id}>Edit Page</a>
 				</div>
 				<div class="admin-header-bar-area admin-header-bar-area-center">
 					{#if pageData?.status == "draft"}

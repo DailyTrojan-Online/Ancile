@@ -19,11 +19,11 @@
 </svelte:head>
 
 
-<div class={"ancile-page-root " + (content.flex ? "ancile-flex" : "")}>
+<div class={"ancile-page-root ancile-flex" + (content.flex ? "ancile-flex" : "")}>
 	{#if content}
 		{#each content.content as block}
 			{@const Block = componentMap[block.type]}
-			<Block blockData={block.data} {postBlockData} blockId={block.id} />
+			<Block blockData={block} {postBlockData} blockId={block.id} />
 		{/each}
 	{/if}
 </div>

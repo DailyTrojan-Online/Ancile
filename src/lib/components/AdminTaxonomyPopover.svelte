@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { SupabaseClient } from "@supabase/supabase-js";
-	import { createPopper, type VirtualElement } from "@popperjs/core";
+	import { createPopper, type Instance, type VirtualElement } from "@popperjs/core";
 	import { onMount, unmount } from "svelte";
 
 	let {
@@ -22,6 +22,8 @@
 	let searchDebounce: string | number | NodeJS.Timeout | undefined;
 	let searchQuery = $state("");
 	let searchResults: any[] = $state([]);
+
+    let popper: Instance;
 	function onSearchUpdate() {
 		if (searchDebounce) {
 			clearTimeout(searchDebounce);
@@ -48,10 +50,12 @@
         }
         searchResults.push(...data);
         loading = false;
+        popper.forceUpdate();
+        popper.update();
 	}
     onMount(() => {
-        createPopper(parentElement, popoverEl, {
-            placement: "auto-start",
+        popper = createPopper(parentElement, popoverEl, {
+            placement: "auto",
 
 			modifiers: [
 				{

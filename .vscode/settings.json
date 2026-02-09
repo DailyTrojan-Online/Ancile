@@ -21,5 +21,8 @@
     "http",
     "net"
   ],
-  "deno.enable": true
+  "deno.enable": true,
+  "search.exclude": {
+    "**.xml": true
+  },
 }
