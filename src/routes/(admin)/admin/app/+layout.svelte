@@ -2,30 +2,16 @@
     import SectionManager from "$lib/components/AppSettings/SectionManager.svelte";
     import ColumnManager from "$lib/components/AppSettings/ColumnManager.svelte";
     import { Toaster, toast } from "svelte-sonner";
+    import {page} from "$app/stores";
 
-    let { data } = $props();
+    let { data , children} = $props();
     let { supabase } = $derived(data);
-
-    let page = $state("sections");
+    
+    
 
     let columnsUnsaved = $state(false);
     let sectionsUnsaved = $state(false);
     $inspect(columnsUnsaved);
-    function setPage(newPage: string) {
-        if (columnsUnsaved || sectionsUnsaved) {
-          toast.error("You have unsaved changes. Please save or discard them before switching pages.", {
-            action: {
-              label: "Discard",
-              onClick:()=>{
-              page = newPage;
-              columnsUnsaved = false;
-              sectionsUnsaved = false;
-            }}
-          });
-            return;
-        }
-        page = newPage;
-    }
 </script>
 
 <div class="admin-page-content">
@@ -36,27 +22,37 @@
     </div>
 
     <div class="admin-editor">
+        
         <Toaster position="top-right" offset="10px" richColors></Toaster>
         <div class="admin-editor-page-switcher">
-            <button
+            <a
                 class="admin-editor-page-switcher-button"
-                class:active={page === "sections"}
-                onclick={() => setPage("sections")}>Sections</button
+                class:active={$page.url.pathname.includes("dashboard")}
+                href="./dashboard">Dashboard</a
             >
-            <button
+            <a
                 class="admin-editor-page-switcher-button"
-                class:active={page === "columns"}
-                onclick={() => setPage("columns")}>Columns</button
+                class:active={$page.url.pathname.includes("sections")}
+                href="./sections">Sections</a
+            >
+            <a
+                class="admin-editor-page-switcher-button"
+                class:active={$page.url.pathname.includes("columns")}
+                href="./columns">Columns</a
+            >
+            <a
+                class="admin-editor-page-switcher-button"
+                class:active={$page.url.pathname.includes("notification_channels")}
+                href="./notification_channels">Notification Channels</a
+            >
+            <a
+                class="admin-editor-page-switcher-button"
+                class:active={$page.url.pathname.includes("send_notifications")}
+                href="./send_notifications">Send Notifications</a
             >
         </div>
         <div class="admin-editor">
-            {#if page === "sections"}
-                <SectionManager {supabase} bind:unsavedData={sectionsUnsaved}
-                ></SectionManager>
-            {:else if page === "columns"}
-                <ColumnManager {supabase} bind:unsavedData={columnsUnsaved}
-                ></ColumnManager>
-            {/if}
+            {@render children()}
         </div>
     </div>
 </div>
@@ -65,6 +61,8 @@
     .admin-editor-page-switcher {
         width: 250px;
         border-right: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
     }
     .admin-editor-page-switcher-button {
         width: 100%;

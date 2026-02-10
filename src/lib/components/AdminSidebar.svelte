@@ -149,10 +149,10 @@
 		<a
 			href="/admin/app"
 			class="button-sidebar"
-			class:button-sidebar-active={page.url.pathname === "/admin/app"}
+			class:button-sidebar-active={page.url.pathname.includes("app")}
 		>
 			<i class="ti ti-devices"></i>
-			<p>App Settings</p>
+			<p>Mobile App</p>
 		</a>
 	</div>
 	<div class="button-wrapper">
