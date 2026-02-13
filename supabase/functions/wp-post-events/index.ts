@@ -201,26 +201,19 @@ async function cleanHtmlContent(html: string) {
     meta[meta.length - 1].remove();
   }
 
+  
   var hide = doc.querySelectorAll(
-    ".av-mini-hide.av-small-hide.av-medium-hide.av-desktop-hide, .av-mini-hide, .av-small-hide",
+      ".av-mini-hide.av-small-hide.av-medium-hide.av-desktop-hide, .av-mini-hide, .av-small-hide",
   );
   hide.forEach((element: any) => {
-    element.remove();
+    //if any parent has ae-review-score, don't remove
+    if(element.parentNode && (element.parentNode).id != "ae-review-score")
+      element.remove();
   });
 
-  var hrEls = doc.querySelectorAll("hr");
-  hrEls.forEach((hr: any) => {
-    var next = hr.nextElementSibling;
-    if (next != null && next.innerHTML.includes("Daily")) {
-      var nextNext = next.nextElementSibling;
-      if (nextNext != null && nextNext.innerHTML.includes("Subscribe")) {
-        hr.remove();
-        next.remove();
-        nextNext.nextElementSibling?.remove();
-        nextNext.remove();
-      }
-    }
-  });
+  var newsletterPlug = doc.querySelector("#newsletter-plug-shortcode")
+  newsletterPlug?.remove();
+
 
   function removeEmptyElements(element: Element) {
     Array.from(element.children).forEach((child) => {

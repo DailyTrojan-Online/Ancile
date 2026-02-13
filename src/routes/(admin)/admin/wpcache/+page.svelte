@@ -251,19 +251,13 @@
         console.log(articles);
         let { error } = await supabase.from("wp_articles").upsert(articles, {
             onConflict: "wp_id",
-            ignoreDuplicates: true,
+            ignoreDuplicates: false,
         });
-        let { error: contentError } = await supabase
-            .from("wp_article_content")
-            .upsert(content, {
-                onConflict: "article_id",
-                ignoreDuplicates: true,
-            });
         let { error: taxonomyJoinError } = await supabase
             .from("wp_article_taxonomy")
             .upsert(taxonomyJoins);
         console.log(taxonomyJoins);
-        console.log(error, contentError, taxonomyJoinError);
+        console.log(error, taxonomyJoinError);
     }
 
     function cleanString(str: string) {
@@ -361,9 +355,7 @@
         rawContent = "";
         openModal(contentComparisonModal, "snippet", "center");
 
-        let content = await fetchArticleContent(article.wp_id);
-        rawContent = content.raw_content;
-        cleanContent = await cleanHtmlContent(rawContent);
+        let content = await fetchArticleContent(article.wp_id);cleanContent = await cleanHtmlContent(rawContent);
     }
 
     async function fetchArticleContent(articleId: number) {
@@ -427,25 +419,13 @@
             ".av-mini-hide.av-small-hide.av-medium-hide.av-desktop-hide, .av-mini-hide, .av-small-hide",
         );
         hide.forEach((element) => {
+          //if any parent has ae-review-score, don't remove
+          if(element.parentNode && (element.parentNode as HTMLElement).id != "ae-review-score")
             element.remove();
         });
 
-        var hrEls = doc.querySelectorAll("hr");
-        hrEls.forEach((hr) => {
-            var next = hr.nextElementSibling;
-            if (next != null && next.innerHTML.includes("Daily")) {
-                var nextNext = next.nextElementSibling;
-                if (
-                    nextNext != null &&
-                    nextNext.innerHTML.includes("Subscribe")
-                ) {
-                    hr.remove();
-                    next.remove();
-                    nextNext.nextElementSibling?.remove();
-                    nextNext.remove();
-                }
-            }
-        });
+        var newsletterPlug = doc.querySelector("#newsletter-plug-shortcode")
+        newsletterPlug?.remove();
 
         function removeEmptyElements(element: Element) {
             Array.from(element.children).forEach((child) => {
