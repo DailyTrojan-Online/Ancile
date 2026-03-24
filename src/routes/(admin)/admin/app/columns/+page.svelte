@@ -128,7 +128,7 @@
 </script>
 
 <div
-    class="admin-editor-column admin-editor-sidebar-inner admin-editor-column-noborder"
+    class="admin-editor-column admin-editor-list-panel admin-editor-sidebar-inner admin-editor-column-noborder"
 >
     <h2 class="h2-with-buttons">
         Columns
@@ -170,9 +170,6 @@
                         {#if column.byline}
                             <h3 class="byline">{column.byline}</h3>
                         {/if}
-                    </div>
-                    <div class="column-id">
-                        {column.tag_id}
                     </div>
                 </button>
             {/each}
@@ -262,6 +259,15 @@
 </div>
 
 <style>
+    .admin-editor-column {
+        gap: 0px;
+        min-width: unset;
+    }
+    .admin-editor-list-panel {
+        max-width: 340px;
+        flex-shrink: 1;
+        min-width: 280px;
+    }
     .admin-editor-column {
         gap: 0px;
     }

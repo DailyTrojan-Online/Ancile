@@ -123,7 +123,7 @@
 </script>
 
 <div
-    class="admin-editor-column admin-editor-sidebar-inner admin-editor-column-noborder"
+    class="admin-editor-column admin-editor-list-panel admin-editor-sidebar-inner admin-editor-column-noborder"
 >
     <h2 class="h2-with-buttons">
         Channels
@@ -160,11 +160,8 @@
                     <div class="flex-stack">
                         <h3 class="title">{channel.name}</h3>
                         {#if channel.description}
-                            <h3 class="byline">{channel.description}</h3>
+                            <p class="byline">{channel.description}</p>
                         {/if}
-                    </div>
-                    <div class="column-id">
-                        {channel.channel_id}
                     </div>
                 </button>
             {/each}
@@ -225,6 +222,12 @@
 <style>
     .admin-editor-column {
         gap: 0px;
+        min-width: unset;
+    }
+    .admin-editor-list-panel {
+        max-width: 340px;
+        flex-shrink: 1;
+        min-width: 250px;
     }
     .header-with-buttons {
         display: flex;
@@ -238,6 +241,10 @@
     .button-group {
         display: flex;
         gap: 8px;
+    }
+    .flex-stack p {
+        text-align: left;
+        /*text-wrap: pretty !important;*/
     }
     .column-id {
         position: absolute;
@@ -293,5 +300,6 @@
     }
     .flex-stack * {
         margin: 0;
+        text-wrap: wrap;
     }
 </style>

@@ -5,9 +5,11 @@
     import RefreshButton from "$lib/components/RefreshButton.svelte";
     import Pagination from "$lib/components/Pagination.svelte";
     import AdminGrid from "$lib/components/AdminGrid.svelte";
+    import MonacoEditor from "$lib/components/MonacoEditor.svelte";
 
     import { closeModalById, openModal } from "$lib/modalManager.svelte";
     import { extractFromHtml } from "@extractus/article-extractor";
+    import AsyncActionButton from "$lib/components/AsyncActionButton.svelte";
 
     let { data } = $props();
 
@@ -158,6 +160,23 @@
                 clean = await cleanHtmlContent(wpData[i].content.rendered);
             } catch (error) {
                 console.error(`Error cleaning article ${id}: ${error}`);
+            }
+            
+            
+            
+            let d = new Date(date);
+            let referenceDate = new Date("June 20, 2023");
+            if(d < referenceDate) {
+              clean = 
+                `<h1>${cleanString(title)}</h1>
+                <p>${excerpt}</p>
+                <h6>By ${author.toUpperCase()}</h6>
+                <p>${d.toLocaleDateString("en-US", {
+                  "month": "long",
+                  "day": "numeric",
+                  "year": "numeric",
+                })}</p>` + clean;
+              console.log("added hed and dek back to article")
             }
             articles.push({
                 wp_id: id,
@@ -350,12 +369,12 @@
 
     let rawContent = $state("");
     let cleanContent = $state("");
+    let currentArticle: WPArticle
 
     async function openComparisonModal(article: WPArticle) {
-        rawContent = "";
         openModal(contentComparisonModal, "snippet", "center");
-
-        let content = await fetchArticleContent(article.wp_id);cleanContent = await cleanHtmlContent(rawContent);
+        cleanContent = article.content;
+        currentArticle = article;
     }
 
     async function fetchArticleContent(articleId: number) {
@@ -470,7 +489,7 @@
         let batchSize = 1000;
         for (let i = 0; i < Math.ceil(totalCount / batchSize); i++) {
             let { data: articleContents, error } = await supabase
-                .from("wp_article_content")
+                .from("wp_articles")
                 .select("*")
                 .range(i * batchSize, (i + 1) * batchSize);
 
@@ -480,23 +499,30 @@
             articleContents.forEach(
                 async (article: {
                     id: string;
-                    raw_content: string;
-                    clean_content: string;
+                    content: string;
+                    date: string;
+                    title: string;
+                    excerpt: string;
+                    author: string;
                 }) => {
-                    let raw = article.raw_content;
-                    let cleaned = "";
-                    try {
-                        cleaned = await cleanHtmlContent(raw);
-                    } catch (error) {
-                        console.error(
-                            `Error cleaning article ${article.id}: ${error}`,
-                        );
-                    }
+                  let d = new Date(article.date);
+                  let referenceDate = new Date("June 20, 2023");
+                  if(d < referenceDate) {
+                    let c = 
+                      `<h1>${article.title}</h1>
+                      <p>${article.excerpt}</p>
+                      <h6>By ${article.author.toUpperCase()}</h6>
+                      <p>${new Date(article.date).toLocaleDateString("en-US", {
+                        "month": "long",
+                        "day": "numeric",
+                        "year": "numeric",
+                      })}</p>` + article.content;
                     let { data, error: err } = await supabase
-                        .from("wp_article_content")
-                        .update({ clean_content: cleaned })
+                        .from("wp_articles")
+                        .update({ content: c })
                         .eq("id", article.id);
-                    totalCleaned++;
+                  }
+                  totalCleaned++;
                 },
             );
         }
@@ -524,6 +550,29 @@
                 break;
         }
     }
+    
+    async function saveUpdatedContent() {
+      
+      let { error } = await supabase.from("wp_articles").update({"content": cleanContent}).eq("id", currentArticle.id)
+      console.log(error)
+    }
+    
+    async function addHedDekBylineBlah() {
+      cleanContent = 
+        `<h1>${currentArticle.title}</h1>
+        <p>${currentArticle.excerpt}</p>
+        <h6>By ${currentArticle.author.toUpperCase()}</h6>
+        <p>${new Date(currentArticle.date).toLocaleDateString("en-US", {
+          "month": "long",
+          "day": "numeric",
+          "year": "numeric",
+        })}</p>` 
+        + cleanContent
+    }
+    
+    function processAddedHedDekStructure() {
+      
+    }
 </script>
 
 {#snippet imageField(data: any)}
@@ -538,7 +587,7 @@
             <p>{totalCount} posts cached</p>
             <Pagination {pageCount} onChange={pageChange} bind:page
             ></Pagination>
-            <button onclick={batchCleanArticles}>clean</button>
+            <button onclick={batchCleanArticles}>Fix Hed</button>
             <button onclick={openIngestModal}>ingest</button>
         </div>
     </div>
@@ -559,7 +608,14 @@
 {#snippet contentComparisonModal()}
     <div class="admin-modal-content">
         <div class="admin-raw-preview">
-            {@html rawContent}
+            <AsyncActionButton action={saveUpdatedContent}>Save</AsyncActionButton>
+            <AsyncActionButton action={addHedDekBylineBlah}>Add Hed & Dek & etc.</AsyncActionButton>
+            {#key cleanContent}
+            <MonacoEditor
+						bind:value={cleanContent}
+						language="html"
+						></MonacoEditor>
+						{/key}
         </div>
         <div class="admin-clean-preview">
             {@html cleanContent}
