@@ -133,6 +133,9 @@ function cleanHtmlContent(html: string) {
   remove.forEach((re: any) => {
     re.remove();
   })
+  doc.querySelector("#wtpsw-post-list-widget-4")?.remove();
+  doc.querySelector("#custom_html-21")?.remove();
+  doc.querySelector("#text-14")?.remove();
 
   
   var hide = doc.querySelectorAll(

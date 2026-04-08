@@ -57,7 +57,7 @@ Deno.serve(async (req) => {
     let clean = "";
 
     try {
-      clean = await cleanHtmlContent(data.content.rendered);
+      clean = cleanHtmlContent(data.content.rendered);
     } catch (error) {
       console.error(`Error cleaning article ${id}: ${error}`);
     }
@@ -164,7 +164,7 @@ Deno.serve(async (req) => {
   }
 });
 
-async function cleanHtmlContent(html: string) {
+function cleanHtmlContent(html: string) {
   const parser = new DOMParser();
   const doc = parser.parseFromString(html, "text/html")!;
   doc.querySelector("[id='article-donation-plug']")?.remove();
@@ -172,34 +172,15 @@ async function cleanHtmlContent(html: string) {
   doc.querySelectorAll("br").forEach((e) => e.remove());
   doc.querySelector("[id='column-hdshot']")?.remove();
 
-  var meta: any = Array.from(
-    doc.querySelectorAll(".av-post-metadata-container"),
+  var remove: any = Array.from(
+    doc.querySelectorAll(".ancile-remove"),
   );
-  meta = meta.filter((e: any) => {
-    return e.querySelectorAll(".av-post-metadata-published-date").length == 0;
-  });
-  if (meta.length > 0) {
-    var siblings = meta[meta.length - 1].parentNode?.childNodes;
-    var index = Array.from(siblings ?? []).indexOf(meta[meta.length - 1]);
-    if (index != null && siblings != null) {
-      for (var i = siblings.length - 1; i > index; i--) {
-        // siblings[i].remove();
-      }
-    }
-    // Traverse up the parent elements and remove any tags that come after the meta element
-    var parent = meta[meta.length - 1].parentNode;
-    while (parent != null) {
-      var parentSiblings = parent.parentNode?.childNodes;
-      if (parentSiblings != null) {
-        var parentIndex = Array.from(parentSiblings).indexOf(parent as any);
-        for (var i = parentSiblings.length - 1; i > parentIndex; i--) {
-          parentSiblings[i].remove();
-        }
-      }
-      parent = parent.parentNode;
-    }
-    meta[meta.length - 1].remove();
-  }
+  remove.forEach((re: any) => {
+    re.remove();
+  })
+  doc.querySelector("#wtpsw-post-list-widget-4")?.remove();
+  doc.querySelector("#custom_html-21")?.remove();
+  doc.querySelector("#text-14")?.remove();
 
   
   var hide = doc.querySelectorAll(
