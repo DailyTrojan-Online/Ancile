@@ -272,11 +272,7 @@
             onConflict: "wp_id",
             ignoreDuplicates: false,
         });
-        let { error: taxonomyJoinError } = await supabase
-            .from("wp_article_taxonomy")
-            .upsert(taxonomyJoins);
-        console.log(taxonomyJoins);
-        console.log(error, taxonomyJoinError);
+        console.log(error);
     }
 
     function cleanString(str: string) {

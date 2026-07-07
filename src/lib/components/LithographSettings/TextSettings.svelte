@@ -32,7 +32,7 @@
 	import { Editor } from "@tiptap/core";
 	import { StarterKit } from "@tiptap/starter-kit";
 	import BubbleMenu from "@tiptap/extension-bubble-menu";
-	import Page from "../../../routes/(admin)/12midnight/+page.svelte";
+	import Page from "../../../routes/(admin)/+page.svelte";
 	import {
 		autoUpdate,
 		flip,

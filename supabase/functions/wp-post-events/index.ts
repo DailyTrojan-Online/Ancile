@@ -147,11 +147,7 @@ Deno.serve(async (req) => {
       onConflict: "wp_id",
       ignoreDuplicates: false,
     });
-    let { error: taxonomyJoinError } = await supabase
-      .from("wp_article_taxonomy")
-      .upsert(taxonomyJoins);
-    console.log(taxonomyJoins);
-    console.log(error, taxonomyJoinError);
+    console.log(error);
     return new Response(JSON.stringify({ error: error }), { status: 200 });
   } catch (err) {
     return new Response(

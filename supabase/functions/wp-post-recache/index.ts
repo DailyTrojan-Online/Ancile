@@ -28,7 +28,7 @@ Deno.serve(async (req) => {
     const params = url.searchParams;
     let count = params.get("count") ?? 25;
     let page = params.get("page") ?? 1;
-    console.log(count)
+    console.log(count);
     let response = await fetch(
       `https://dailytrojan.com/wp-json/wp/v2/posts?per_page=${count}&page=${page}`,
     );
@@ -44,7 +44,7 @@ Deno.serve(async (req) => {
       article_id: number;
       taxonomy_id: number;
     }[] = [];
-    
+
     let categories: any[] = [];
     let tags: any[] = [];
     data.forEach((a: any) => {
@@ -55,17 +55,17 @@ Deno.serve(async (req) => {
       let date = a.date;
       let author = a.author_field;
       let image = a.yoast_head_json.og_image[0].url;
-      let excerpt = a.excerpt.rendered ;
-  
+      let excerpt = a.excerpt.rendered;
+
       let taxonomy = a.categories.concat(a.tags);
-  
+
       let clean = "";
       try {
         clean = cleanHtmlContent(a.content.rendered);
       } catch (error) {
         console.error(`Error cleaning article ${id}: ${error}`);
       }
-      
+
       articles.push({
         wp_id: id,
         slug: slug,
@@ -78,13 +78,13 @@ Deno.serve(async (req) => {
         taxonomy,
         content: clean,
       });
-  
+
       content.push({
         article_id: id,
         raw_content: a.content.rendered,
         clean_content: clean,
       });
-  
+
       a.categories.forEach((cat: any) => {
         taxonomyJoins.push({
           article_id: id,
@@ -97,16 +97,12 @@ Deno.serve(async (req) => {
           taxonomy_id: cat,
         });
       });
-    })
-    
+    });
 
     let { error } = await supabase.from("wp_articles").upsert(articles, {
       onConflict: "wp_id",
       ignoreDuplicates: false,
     });
-    let { error: taxonomyJoinError } = await supabase
-      .from("wp_article_taxonomy")
-      .upsert(taxonomyJoins);
     return new Response(JSON.stringify({ error: error }), { status: 200 });
   } catch (err) {
     return new Response(
@@ -127,29 +123,25 @@ function cleanHtmlContent(html: string) {
   doc.querySelectorAll("br").forEach((e) => e.remove());
   doc.querySelector("[id='column-hdshot']")?.remove();
 
-  var remove: any = Array.from(
-    doc.querySelectorAll(".ancile-remove"),
-  );
+  var remove: any = Array.from(doc.querySelectorAll(".ancile-remove"));
   remove.forEach((re: any) => {
     re.remove();
-  })
+  });
   doc.querySelector("#wtpsw-post-list-widget-4")?.remove();
   doc.querySelector("#custom_html-21")?.remove();
   doc.querySelector("#text-14")?.remove();
 
-  
   var hide = doc.querySelectorAll(
-      ".av-mini-hide.av-small-hide.av-medium-hide.av-desktop-hide, .av-mini-hide, .av-small-hide",
+    ".av-mini-hide.av-small-hide.av-medium-hide.av-desktop-hide, .av-mini-hide, .av-small-hide",
   );
   hide.forEach((element: any) => {
     //if any parent has ae-review-score, don't remove
-    if(element.parentNode && (element.parentNode).id != "ae-review-score")
+    if (element.parentNode && element.parentNode.id != "ae-review-score")
       element.remove();
   });
 
-  var newsletterPlug = doc.querySelector("#newsletter-plug-shortcode")
+  var newsletterPlug = doc.querySelector("#newsletter-plug-shortcode");
   newsletterPlug?.remove();
-
 
   function removeEmptyElements(element: Element) {
     Array.from(element.children).forEach((child) => {
