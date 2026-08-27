@@ -6,6 +6,7 @@
     import Pagination from "$lib/components/Pagination.svelte";
     import AdminGrid from "$lib/components/AdminGrid.svelte";
     import MonacoEditor from "$lib/components/MonacoEditor.svelte";
+    import { Toaster, toast } from "svelte-sonner";
 
     import { closeModalById, openModal } from "$lib/modalManager.svelte";
     import { extractFromHtml } from "@extractus/article-extractor";
@@ -54,6 +55,10 @@
         {
             label: "Publish Date",
             key: "date",
+        },
+        {
+            label: "",
+            renderer: copyUrl,
         },
     ];
 
@@ -161,22 +166,20 @@
             } catch (error) {
                 console.error(`Error cleaning article ${id}: ${error}`);
             }
-            
-            
-            
+
             let d = new Date(date);
             let referenceDate = new Date("June 20, 2023");
-            if(d < referenceDate) {
-              clean = 
-                `<h1>${cleanString(title)}</h1>
+            if (d < referenceDate) {
+                clean =
+                    `<h1>${cleanString(title)}</h1>
                 <p>${excerpt}</p>
                 <h6>By ${author.toUpperCase()}</h6>
                 <p>${d.toLocaleDateString("en-US", {
-                  "month": "long",
-                  "day": "numeric",
-                  "year": "numeric",
+                    month: "long",
+                    day: "numeric",
+                    year: "numeric",
                 })}</p>` + clean;
-              console.log("added hed and dek back to article")
+                console.log("added hed and dek back to article");
             }
             articles.push({
                 wp_id: id,
@@ -365,7 +368,7 @@
 
     let rawContent = $state("");
     let cleanContent = $state("");
-    let currentArticle: WPArticle
+    let currentArticle: WPArticle;
 
     async function openComparisonModal(article: WPArticle) {
         openModal(contentComparisonModal, "snippet", "center");
@@ -434,12 +437,15 @@
             ".av-mini-hide.av-small-hide.av-medium-hide.av-desktop-hide, .av-mini-hide, .av-small-hide",
         );
         hide.forEach((element) => {
-          //if any parent has ae-review-score, don't remove
-          if(element.parentNode && (element.parentNode as HTMLElement).id != "ae-review-score")
-            element.remove();
+            //if any parent has ae-review-score, don't remove
+            if (
+                element.parentNode &&
+                (element.parentNode as HTMLElement).id != "ae-review-score"
+            )
+                element.remove();
         });
 
-        var newsletterPlug = doc.querySelector("#newsletter-plug-shortcode")
+        var newsletterPlug = doc.querySelector("#newsletter-plug-shortcode");
         newsletterPlug?.remove();
 
         function removeEmptyElements(element: Element) {
@@ -501,24 +507,24 @@
                     excerpt: string;
                     author: string;
                 }) => {
-                  let d = new Date(article.date);
-                  let referenceDate = new Date("June 20, 2023");
-                  if(d < referenceDate) {
-                    let c = 
-                      `<h1>${article.title}</h1>
+                    let d = new Date(article.date);
+                    let referenceDate = new Date("June 20, 2023");
+                    if (d < referenceDate) {
+                        let c =
+                            `<h1>${article.title}</h1>
                       <p>${article.excerpt}</p>
                       <h6>By ${article.author.toUpperCase()}</h6>
                       <p>${new Date(article.date).toLocaleDateString("en-US", {
-                        "month": "long",
-                        "day": "numeric",
-                        "year": "numeric",
+                          month: "long",
+                          day: "numeric",
+                          year: "numeric",
                       })}</p>` + article.content;
-                    let { data, error: err } = await supabase
-                        .from("wp_articles")
-                        .update({ content: c })
-                        .eq("id", article.id);
-                  }
-                  totalCleaned++;
+                        let { data, error: err } = await supabase
+                            .from("wp_articles")
+                            .update({ content: c })
+                            .eq("id", article.id);
+                    }
+                    totalCleaned++;
                 },
             );
         }
@@ -546,35 +552,47 @@
                 break;
         }
     }
-    
+
     async function saveUpdatedContent() {
-      
-      let { error } = await supabase.from("wp_articles").update({"content": cleanContent}).eq("id", currentArticle.id)
-      console.log(error)
+        let { error } = await supabase
+            .from("wp_articles")
+            .update({ content: cleanContent })
+            .eq("id", currentArticle.id);
+        console.log(error);
     }
-    
+
     async function addHedDekBylineBlah() {
-      cleanContent = 
-        `<h1>${currentArticle.title}</h1>
+        cleanContent =
+            `<h1>${currentArticle.title}</h1>
         <p>${currentArticle.excerpt}</p>
         <h6>By ${currentArticle.author.toUpperCase()}</h6>
         <p>${new Date(currentArticle.date).toLocaleDateString("en-US", {
-          "month": "long",
-          "day": "numeric",
-          "year": "numeric",
-        })}</p>` 
-        + cleanContent
+            month: "long",
+            day: "numeric",
+            year: "numeric",
+        })}</p>` + cleanContent;
     }
-    
-    function processAddedHedDekStructure() {
-      
-    }
+
+    function processAddedHedDekStructure() {}
 </script>
 
 {#snippet imageField(data: any)}
     <img class="admin-grid-image" src={data.image} alt="" />
 {/snippet}
 
+{#snippet copyUrl(data: any)}
+    <button
+        onclick={async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            await navigator.clipboard.writeText(data.url);
+            toast("Copied to clipboard");
+        }}
+        class="admin-grid-button button-sub admin-row-visible-on-hover"
+    >
+        <i class="ti ti-link"></i>Copy URL
+    </button>
+{/snippet}
 <div class="admin-page-content">
     <div class="admin-page-header">
         <div class="admin-buttons">
@@ -589,13 +607,14 @@
     </div>
 
     <div class="admin-editor">
+        <Toaster position="top-right" offset="10px" richColors></Toaster>
         <div class="admin-editor-fullwidth">
             <AdminGrid
                 {displayFields}
                 showCheckboxes={false}
                 callback={openComparisonModal}
                 data={loadedCache!}
-                columnWidths={"90px 350px 200px 1fr"}
+                columnWidths={"90px 350px 200px 300px 1fr"}
             ></AdminGrid>
         </div>
     </div>
@@ -604,14 +623,16 @@
 {#snippet contentComparisonModal()}
     <div class="admin-modal-content">
         <div class="admin-raw-preview">
-            <AsyncActionButton action={saveUpdatedContent}>Save</AsyncActionButton>
-            <AsyncActionButton action={addHedDekBylineBlah}>Add Hed & Dek & etc.</AsyncActionButton>
+            <AsyncActionButton action={saveUpdatedContent}
+                >Save</AsyncActionButton
+            >
+            <AsyncActionButton action={addHedDekBylineBlah}
+                >Add Hed & Dek & etc.</AsyncActionButton
+            >
             {#key cleanContent}
-            <MonacoEditor
-						bind:value={cleanContent}
-						language="html"
-						></MonacoEditor>
-						{/key}
+                <MonacoEditor bind:value={cleanContent} language="html"
+                ></MonacoEditor>
+            {/key}
         </div>
         <div class="admin-clean-preview">
             {@html cleanContent}
