@@ -4,7 +4,7 @@ import type { RequestHandler } from "./$types";
 export async function POST({ request, locals: { supabase }, getClientAddress }) {
   const userAgent = request.headers.get('user-agent') || 'Unknown';
   const ipAddress = getClientAddress();
-  const { url, game, event, error: err } = await request.json();
+  const { url, game, event, error: err, data } = await request.json();
   const { error } = await supabase
     .from("analytics")
     .insert([
@@ -13,7 +13,7 @@ export async function POST({ request, locals: { supabase }, getClientAddress }) 
         user_agent: userAgent,
         user_ip: ipAddress,
         type: "game",
-        data: { game, event, error: err },
+        data: { game, event, error: err, ...data },
       },
     ]);
   if (error) {
