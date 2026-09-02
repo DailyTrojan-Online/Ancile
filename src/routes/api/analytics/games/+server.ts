@@ -1,0 +1,24 @@
+import { json } from "@sveltejs/kit";
+import type { RequestHandler } from "./$types";
+
+export async function POST({ request, locals: { supabase }, getClientAddress }) {
+  const userAgent = request.headers.get('user-agent') || 'Unknown';
+  const ipAddress = getClientAddress();
+  const { url, game, event } = await request.json();
+  const { error } = await supabase
+    .from("analytics")
+    .insert([
+      {
+        url,
+        user_agent: userAgent,
+        user_ip: ipAddress,
+        type: "game",
+        data: { game, event },
+      },
+    ]);
+  if (error) {
+    return json({ success: false, error: error.message }, { status: 500 });
+  }
+
+  return json({ success: true });
+}
