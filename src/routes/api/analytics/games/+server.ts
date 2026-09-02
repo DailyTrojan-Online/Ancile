@@ -16,11 +16,17 @@ export async function POST({ request, locals: { supabase }, getClientAddress }) 
         data: { game, event, error: err, ...data },
       },
     ]);
+  const corsHeaders = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type'
+  };
+
   if (error) {
-    return json({ success: false, error: error.message }, { status: 500 });
+    return json({ success: false, error: error.message }, { status: 500, headers: corsHeaders });
   }
 
-  return json({ success: true });
+  return json({ success: true }, { headers: corsHeaders });
 }
 
 export async function OPTIONS() {
