@@ -4,11 +4,13 @@
     import AsyncActionButton from "$lib/components/AsyncActionButton.svelte";
     let { data } = $props();
     let { supabase } = $derived(data);
-    
+
     let unsavedData = $state(false);
 
     import { beforeNavigate } from "$app/navigation";
     import { browser } from "$app/environment";
+    import AdminDateTimeInput from "$lib/components/AdminDateTimeInput.svelte";
+    import AdminUrlListInput from "$lib/components/AdminUrlListInput.svelte";
     if (browser) {
         beforeNavigate(({ cancel, type }) => {
             if (unsavedData) {
@@ -20,8 +22,7 @@
                     ) {
                         cancel();
                     }
-                }
-                else if (type === "leave") {
+                } else if (type === "leave") {
                     cancel();
                 }
             }
@@ -36,91 +37,94 @@
         });
     }
 
-    async function refreshColumns() {
-        columns = null;
+    async function refreshEditions() {
+        editions = null;
         let { data, error } = await supabase
-            .from("app_columns")
-            .select("id,tag_id,title,byline,description,image,section");
-        if (error) {
+            .from("app_special_editions")
+            .select("id,publish_at,expire_at,image,title,subtitle,data");
+        if (error || data == null || data.length < 1) {
             console.error(error);
         }
-        columns = [...data];
-        originalColumns = [...data];
+        editions = [...data];
+        originalEditions = [...data];
     }
 
-    async function saveColumns() {
+    async function saveEditions() {
+        // return;
         let { data: delData, error: delError } = await supabase
-            .from("app_columns")
+            .from("app_special_editions")
             .delete()
             .not("id", "is", null);
         if (delError) {
             console.error(delError);
         }
 
-        console.log(columns);
+        console.log(editions);
         let { data: insData, error: insError } = await supabase
-            .from("app_columns")
-            .upsert(columns);
+            .from("app_special_editions")
+            .upsert(editions);
         if (insError) {
             console.error(insError);
         }
-        console.log("Columns saved:", columns);
+        console.log("Special editions saved:", editions);
         isModified = false;
     }
     onMount(() => {
-        refreshColumns();
+        refreshEditions();
     });
-
-    type Column = {
-        id: number;
+    type SpecialEditionItem = {
+        article_url: string;
+    };
+    type SpecialEdition = {
+        id: string;
+        publish_at: string | null;
+        expire_at: string | null;
         title: string;
-        tag_id: number;
+        style: string;
         image?: string;
-        byline?: string;
-        description?: string;
-        section: string;
+        subtitle?: string;
+        data: SpecialEditionItem[];
     };
 
-    let columns: Column[] | null = $state(null);
+    let editions: SpecialEdition[] | null = $state(null);
 
-    let originalColumns: Column[] | null = $state(null);
+    let originalEditions: SpecialEdition[] | null = $state(null);
 
     let isModified = $derived(
-        JSON.stringify(columns) !== JSON.stringify(originalColumns),
+        JSON.stringify(editions) !== JSON.stringify(originalEditions),
     );
     $effect(() => {
         unsavedData = isModified;
     });
 
-    function addColumn() {
-        if (columns === null) {
-            columns = [];
+    function addEdition() {
+        if (editions === null) {
+            editions = [];
         }
-        const newId =
-            columns.length > 0 ? Math.max(...columns.map((c) => c.id)) + 1 : 1;
-        const newColumn: Column = {
-            id: newId,
-            title: "New Column",
-            tag_id: newId,
+        const newEdition: SpecialEdition = {
+            id: crypto.randomUUID(),
+            title: "New Special Edition",
             image: "",
-            byline: "",
-            description: "",
-            section: "",
+            subtitle: "",
+            style: "default",
+            publish_at: null,
+            expire_at: null,
+            data: [],
         };
-        columns.push(newColumn);
-        selectedIndex = columns.length - 1;
+        editions.push(newEdition);
+        selectedIndex = editions.length - 1;
     }
 
     let selectedIndex: number | null = $state(null);
 
-    async function deleteColumn(column: Column) {
-        if (columns == null) return;
+    async function deleteEdition(edition: SpecialEdition) {
+        if (editions == null) return;
         selectedIndex = null;
-        columns = columns.filter((c) => c.id !== column.id);
+        editions = editions.filter((c) => c.id !== edition.id);
         let { data: delData, error: delError } = await supabase
-            .from("app_columns")
+            .from("app_special_editions")
             .delete()
-            .eq("id", column.id);
+            .eq("id", edition.id);
         if (delError) {
             console.error(delError);
         }
@@ -131,15 +135,16 @@
     class="admin-editor-column admin-editor-list-panel admin-editor-sidebar-inner admin-editor-column-noborder"
 >
     <h2 class="h2-with-buttons">
-        Columns
+        Special Editions
         <div class="button-group">
             {#if isModified}
-                <AsyncActionButton action={saveColumns}>Save</AsyncActionButton>
+                <AsyncActionButton action={saveEditions}>Save</AsyncActionButton
+                >
             {/if}
             <button
                 class="admin-button button-icon"
-                onclick={addColumn}
-                title="Add Column"
+                onclick={addEdition}
+                title="Add Special Edition"
             >
                 <i class="ti ti-plus"></i>
             </button>
@@ -147,14 +152,14 @@
     </h2>
 
     <div class="list">
-        {#if columns === null}
+        {#if editions === null}
             <div class="admin-grid-loader">
                 <i class="ti ti-loader-2"></i>
             </div>
-        {:else if columns.length == 0}
-        <p>There are no columns yet. Click [+] to add one.</p>
+        {:else if editions.length == 0}
+            <p>There are no special editions yet. Click [+] to add one.</p>
         {:else}
-            {#each columns as column, i}
+            {#each editions as edition, i}
                 <button
                     class="column-item"
                     class:active={i === selectedIndex}
@@ -162,13 +167,13 @@
                         selectedIndex = i;
                     }}
                 >
-                    {#if column.image}
-                        <img src={column.image} alt="" />
+                    {#if edition.image}
+                        <img src={edition.image} alt="" />
                     {/if}
                     <div class="flex-stack">
-                        <h3 class="title">{column.title}</h3>
-                        {#if column.byline}
-                            <h3 class="byline">{column.byline}</h3>
+                        <h3 class="title">{edition.title}</h3>
+                        {#if edition.subtitle}
+                            <h3 class="byline">{edition.subtitle}</h3>
                         {/if}
                     </div>
                 </button>
@@ -183,11 +188,11 @@
     style:gap="20px !important"
 >
     <h2 class="h2-with-buttons">
-        Edit Column
-        {#if selectedIndex !== null && columns !== null}
+        Edit Special Edition
+        {#if selectedIndex !== null && editions !== null}
             <div class="button-group">
                 <AsyncActionButton
-                    action={() => deleteColumn(columns![selectedIndex!])}
+                    action={() => deleteEdition(editions![selectedIndex!])}
                 >
                     Delete
                 </AsyncActionButton>
@@ -195,66 +200,63 @@
         {/if}
     </h2>
 
-    {#if selectedIndex !== null && columns !== null}
-        <div class="admin-editor-input-group">
-            <div class="admin-editor-input-label">TAG ID</div>
-            <input
-                type="number"
-                class="admin-editor-input"
-                bind:value={columns[selectedIndex].tag_id}
-                placeholder="Column ID"
-            />
-        </div>
+    {#if selectedIndex !== null && editions !== null}
         <div class="admin-editor-input-group">
             <div class="admin-editor-input-label">Title</div>
             <input
                 type="text"
                 class="admin-editor-input"
-                bind:value={columns[selectedIndex].title}
-                placeholder="Column title"
-            />
-        </div>
-        <div class="admin-editor-input-group">
-            <div class="admin-editor-input-label">Byline</div>
-            <input
-                type="text"
-                class="admin-editor-input"
-                bind:value={columns[selectedIndex].byline}
-                placeholder="Column byline"
+                bind:value={editions[selectedIndex].title}
+                placeholder="Special edition title"
             />
         </div>
 
         <div class="admin-editor-input-group">
-            <div class="admin-editor-input-label">Section</div>
+            <div class="admin-editor-input-label">Visual Style</div>
             <select
                 class="admin-editor-input-dropdown"
-                bind:value={columns[selectedIndex].section}
+                bind:value={editions[selectedIndex].style}
             >
                 <option value="" selected disabled hidden
                     >Select an option</option
                 >
-                <option value={"arts_entertainment"}
-                    >Arts & Entertainment</option
-                >
-                <option value={"sports"}>Sports</option>
-                <option value={"opinion"}>Opinion</option>
+                <option value={"default"}>Default</option>
+                <option value={"magazine"}>Magazine</option>
+                <option value={"features"}>Features Supplement</option>
             </select>
         </div>
         <div class="admin-editor-input-group">
-            <div class="admin-editor-input-label">Description</div>
+            <div class="admin-editor-input-label">Subtitle</div>
             <textarea
                 class="admin-editor-metadata-textarea"
-                bind:value={columns[selectedIndex].description}
-                placeholder="Column description"
-            ></textarea>
+                bind:value={editions[selectedIndex].subtitle}
+                placeholder="Special edition description"></textarea>
+        </div>
+        <div class="admin-editor-input-group">
+            <div class="admin-editor-input-label">Publish Date</div>
+            <AdminDateTimeInput
+                bind:value={editions[selectedIndex].publish_at}
+                emptyLabel="Publish date not set."
+            />
+        </div>
+        <div class="admin-editor-input-group">
+            <div class="admin-editor-input-label">Expiration Date</div>
+            <AdminDateTimeInput
+                bind:value={editions[selectedIndex].expire_at}
+                emptyLabel="Expiration not set."
+            />
         </div>
         <MediaLibraryInput
-            bind:image={columns[selectedIndex].image}
+            bind:image={editions[selectedIndex].image}
             {supabase}
-            title="Column Image"
+            title="Cover Image"
+        />
+        <AdminUrlListInput
+            bind:items={editions[selectedIndex].data}
+            title="Articles"
         />
     {:else}
-        <p>Select a column to edit its properties</p>
+        <p>Select a special edition to edit its properties</p>
     {/if}
 </div>
 
@@ -325,8 +327,7 @@
         width: 50px;
         height: 50px;
         object-fit: cover;
-        border-radius: 100px;
-        filter: grayscale(1);
+        border-radius: 4px;
     }
     .flex-stack {
         display: flex;

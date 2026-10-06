@@ -1,8 +1,5 @@
 <script lang="ts">
-	import moment from "moment";
 	import MediaLibrary from "$lib/components/MediaLibrary.svelte";
-	//@ts-ignore
-	import { DateTime } from "luxon";
 	import "$lib/layoutEditor.css";
 	import Lithograph from "$lib/components/Lithograph.svelte";
 	import { goto } from "$app/navigation";
@@ -22,6 +19,7 @@
 	import MonacoEditor from "$lib/components/MonacoEditor.svelte";
 	import { fade } from "svelte/transition";
 	import MediaLibraryInput from "$lib/components/MediaLibraryInput.svelte";
+	import AdminDateTimeInput from "$lib/components/AdminDateTimeInput.svelte";
 	let { data } = $props();
 	let { page: originalPageData, supabase } = $derived(data);
 	// svelte-ignore state_referenced_locally
@@ -29,9 +27,6 @@
 	let page = $state(originalPageData);
 	let pageCategories: {name: string, id: string}[] = $state(page.post_categories.map((category: { category: { name: any; id: any; }; }) => {return {name: category.category.name, id: category.category.id}}));
 	let pageTags: {name: string, id: string}[] = $state(page.post_tags.map((tag: { tag: { name: any; id: any; }; }) => {return {name: tag.tag.name, id: tag.tag.id}}));
-	page.publish_date = page.publish_date
-		? DateTime.fromISO(page.publish_date).toISO().slice(0, 16)
-		: null;
 	let lithograph;
 	let pageSlugWithoutSelfSlug = page.slug.replace(
 		new RegExp(page.self_slug + "$"),
@@ -141,9 +136,6 @@
 		flex: boolean | null;
 	} = $state({ content: [], flex: false });
 
-	let scheduledDatePicker: HTMLInputElement;
-	let scheduledDatePickerSecondary: HTMLInputElement;
-
 	let mediaLibraryOpen = $state(false);
 	let selectedItem: any = $state(null);
 	function onMediaConfirm() {
@@ -152,7 +144,7 @@
 			page.featured_image = selectedItem.url;
 		}
 	}
-	
+
 	//TODO: make this reversible
 	function preview() {
 		previewing = true;
@@ -326,7 +318,7 @@
 	</div>
 	<div class="admin-editor">
 		<Toaster position="top-right" offset="10px" richColors></Toaster>
-		
+
 		<div
 			class="admin-editor-css-sidebar admin-editor-sidebar"
 			class:admin-editor-sidebar-collapsed={!previewing}
@@ -379,25 +371,10 @@
 					</div>
 					<div class="admin-editor-input-group">
 						<div class="admin-editor-input-label">Schedule</div>
-						<div
-							role="presentation"
-							class={"admin-editor-metadata-date"}
-							onclick={() => {
-								scheduledDatePicker.showPicker();
-							}}
-						>
-							{page.publish_date == "" || page.publish_date == null
-								? page.post_type.charAt(0).toUpperCase() +
-									page.post_type.slice(1) +
-									" is not scheduled."
-								: moment.utc(page.publish_date).format("MMMM Do YYYY, h:mm a")}
-							<i class="ti ti-pencil"></i>
-							<input
-								bind:this={scheduledDatePicker}
-								bind:value={page.publish_date}
-								type="datetime-local"
-							/>
-						</div>
+						<AdminDateTimeInput
+							bind:value={page.publish_date}
+							emptyLabel="Not scheduled."
+						/>
 					</div>
 				</div>
 				<div class="admin-editor-sidebar-section">
@@ -470,7 +447,7 @@
 					{:else}
 						<div class="admin-editor-input-group">
 							<div class="admin-editor-input-label">Categories</div>
-							
+
 							<AdminTaxonomyInput {supabase} bind:taxonomies={pageCategories} table="categories"></AdminTaxonomyInput>
 						</div>
 						<div class="admin-editor-input-group">
@@ -511,22 +488,11 @@
 		class:display-none={!showScheduleUI}
 		class:display-contents={showScheduleUI}
 	>
-		<div
-			role="presentation"
-			class={"admin-editor-metadata-date"}
-			onclick={() => {
-				scheduledDatePickerSecondary.showPicker();
-			}}
-		>
-			{page.publish_date == "" || page.publish_date == null
-				? "Pick date and time"
-				: moment.utc(page.publish_date).format("MMMM Do YYYY, h:mm a")}
-			<input
-				bind:this={scheduledDatePickerSecondary}
-				bind:value={page.publish_date}
-				type="datetime-local"
-			/>
-		</div>
+		<AdminDateTimeInput
+			bind:value={page.publish_date}
+			emptyLabel="Pick date and time"
+			showPencil={false}
+		/>
 		<button class="admin-button button-primary" onclick={schedulePublish}
 			>Schedule</button
 		>

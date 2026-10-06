@@ -6,8 +6,8 @@
 
     let { data , children} = $props();
     let { supabase } = $derived(data);
-    
-    
+
+
 
     let columnsUnsaved = $state(false);
     let sectionsUnsaved = $state(false);
@@ -22,7 +22,7 @@
     </div>
 
     <div class="admin-editor">
-        
+
         <Toaster position="top-right" offset="10px" richColors></Toaster>
         <div class="admin-editor-page-switcher">
             <a
@@ -39,6 +39,11 @@
                 class="admin-editor-page-switcher-button"
                 class:active={$page.url.pathname.includes("columns")}
                 href="./columns">Columns</a
+            >
+            <a
+                class="admin-editor-page-switcher-button"
+                class:active={$page.url.pathname.includes("special_editions")}
+                href="./special_editions">Special Editions</a
             >
             <a
                 class="admin-editor-page-switcher-button"
