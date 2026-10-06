@@ -41,7 +41,7 @@
         editions = null;
         let { data, error } = await supabase
             .from("app_special_editions")
-            .select("id,publish_at,expire_at,image,title,subtitle,data");
+            .select("*");
         if (error || data == null || data.length < 1) {
             console.error(error);
         }
