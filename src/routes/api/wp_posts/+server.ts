@@ -14,6 +14,13 @@ export async function GET({ locals: { supabase }, url, request }) {
       : [];
   }
 
+
+  function parseListString(param: string) {
+    return param
+      ? param.replace(/\s+/g, "").split(",").filter(Boolean).map(String)
+      : [];
+  }
+
   let tags_exclude = params.get("tags_exclude") ?? "";
   let categories_exclude = params.get("categories_exclude") ?? "";
   let tags_include = params.get("tags") ?? "";
@@ -41,7 +48,7 @@ export async function GET({ locals: { supabase }, url, request }) {
   let id_include = parseList(include_id);
 
   let slug = params.get("slug") ?? "";
-  let slugs = parseList(slug);
+  let slugs = parseListString(slug);
 
   // const { data, error } = await supabase.rpc("get_wp_articles", {
   //   page,
@@ -68,7 +75,8 @@ export async function GET({ locals: { supabase }, url, request }) {
     query = query.in("wp_id", id_include);
   }
   if (slugs.length > 0) {
-    query = query.in("slug",  slugs);
+    query = query.in("slug", slugs);
+    console.log(slugs);
   }
 
   query = query
